@@ -1,3 +1,4 @@
+
 export enum Role {
   USER = 'user',
   MODEL = 'model',
@@ -65,4 +66,32 @@ export interface ArchivedFile {
   size: number;
   content: string | null; // Store content for text-based files
   uploadedAt: string;
+}
+
+// --- NEW AGENT ARCHITECTURE TYPES ---
+
+export type JobType = 
+  | 'post_social' 
+  | 'create_listing' 
+  | 'deploy_code' 
+  | 'analyze_metrics' 
+  | 'sync_inventory';
+
+export type JobStatus = 'pending' | 'processing' | 'awaiting_approval' | 'completed' | 'failed';
+
+export interface Job {
+  id: string;
+  type: JobType;
+  payload: any;
+  status: JobStatus;
+  createdAt: string;
+  scheduledFor?: string; // ISO string for future execution
+  requiresApproval: boolean;
+  result?: any;
+}
+
+export interface AgentStateSnapshot {
+    queue: Job[];
+    pendingApprovals: Job[];
+    history: Job[];
 }

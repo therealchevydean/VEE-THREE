@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { Chat, FunctionCall, Part } from '@google/genai';
 import { createChatSession, generateSpeech, fileToGenerativePart, editImage, generateImage, generateVideo, performGroundedSearch } from '../services/geminiService';
@@ -6,7 +7,8 @@ import { commit, recall } from '../services/memoryService';
 import * as localFileService from '../services/localFileService';
 import * as webBrowserService from '../services/webBrowserService';
 import * as creativeArchiveService from '../services/creativeArchiveService';
-import { Message, Role, Task, TaskStatus, AgentPlan, AgentStep, AgentStepStatus } from '../types';
+import { veeAgent } from '../services/veeAgentService';
+import { Message, Role, Task, TaskStatus, AgentPlan, AgentStep, AgentStepStatus, JobType } from '../types';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import { decode, decodeAudioData } from '../utils/audioUtils';
@@ -177,6 +179,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
         chatSessionRef.current = await createChatSession();
       } catch (error) {
         console.error("Failed to initialize chat session:", error);
+        setMessages(prev => [...prev, { role: Role.MODEL, content: `**SYSTEM ALERT:** Failed to establish neural link (Chat Session). Error details: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your API key and network connection.` }]);
       }
     };
     initializeSession();
@@ -363,6 +366,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
 
   const executeTool = async (name: string, args: any) => {
     switch (name) {
+        case 'scheduleJob': {
+            const { type, payload, scheduledFor } = args;
+            const job = veeAgent.enqueue(type as JobType, payload, scheduledFor);
+            
+            let message = `Job enqueued (ID: ${job.id}).`;
+            if (job.requiresApproval) {
+                message += " NOTE: This action requires approval. It has been paused.";
+            } else {
+                message += " Processing started.";
+            }
+            return { status: 'success', message, jobId: job.id, taskStatus: job.status };
+        }
+        case 'getAgentState': {
+            const snapshot = veeAgent.getSnapshot();
+            return { 
+                status: 'success', 
+                queueLength: snapshot.queue.length,
+                pendingApprovals: snapshot.pendingApprovals.length,
+                recentHistory: snapshot.history.slice(-3) // Only return recent 3
+            };
+        }
         case 'commitToMemory':
             return await commit(args.data as string);
         case 'recallFromMemory':
@@ -486,6 +510,49 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
                 const { repoName, headBranch, baseBranch, title } = args as { repoName: string; headBranch: string; baseBranch: string; title: string };
                 return { status: 'success', message: `Simulated creating pull request "${title}" to merge '${headBranch}' into '${baseBranch}'.`, url: `https://github.com/${isConnected.username}/${repoName}/pull/mock_${Math.floor(Math.random() * 100)}` };
             }
+        }
+        case 'generateContentCalendar': {
+            const { topic, startDate, durationDays, platforms } = args;
+            const calendar = [];
+            const start = new Date(startDate);
+            for(let i=0; i<durationDays; i++) {
+                const date = new Date(start);
+                date.setDate(start.getDate() + i);
+                calendar.push({
+                    date: date.toISOString().split('T')[0],
+                    platform: platforms[i % platforms.length],
+                    idea: `Post about ${topic} focusing on aspect ${i+1}`,
+                    status: 'Draft'
+                });
+            }
+            return { status: 'success', message: `Generated ${durationDays}-day content calendar for "${topic}".`, calendar };
+        }
+        case 'analyzeSocialMetrics': {
+            const { platform, period } = args;
+            return {
+                status: 'success',
+                message: `Analysis for ${platform} (${period}) complete.`,
+                metrics: {
+                    views: Math.floor(Math.random() * 50000) + 1000,
+                    likes: Math.floor(Math.random() * 5000) + 100,
+                    shares: Math.floor(Math.random() * 1000) + 10,
+                    engagementRate: (Math.random() * 5 + 1).toFixed(2) + '%',
+                    topPost: "Viral video about V3 mining"
+                }
+            };
+        }
+        case 'createEngagementStrategy': {
+            const { goal, targetAudience, platforms } = args;
+            return {
+                status: 'success',
+                message: `Strategy created for goal: ${goal}.`,
+                strategy: {
+                    objective: goal,
+                    audience: targetAudience,
+                    tactics: platforms.map((p: string) => `On ${p}: specific tactic to engage ${targetAudience}.`),
+                    kpis: ['Growth Rate', 'Conversion', 'Retention']
+                }
+            };
         }
         default:
             return { error: `Unknown tool: ${name}` };

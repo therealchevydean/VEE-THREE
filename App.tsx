@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import ChatInterface from './components/ChatInterface';
 import Header from './components/Header';
@@ -8,6 +9,7 @@ import CreativeArchive from './components/CreativeArchive';
 import { Task, TaskStatus, ArchivedFile } from './types';
 import { getConnections, connect, disconnect, Connection } from './services/authService';
 import * as creativeArchiveService from './services/creativeArchiveService';
+import { initializeAgent } from './services/veeAgentService';
 
 const App: React.FC = () => {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
@@ -18,6 +20,11 @@ const App: React.FC = () => {
   const [connections, setConnections] = useState<Record<string, Connection | null>>({});
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [archiveFiles, setArchiveFiles] = useState<ArchivedFile[]>([]);
+
+  // Initialize the VEE Agent Scheduler
+  useEffect(() => {
+    initializeAgent();
+  }, []);
 
   // Load data from localStorage on initial mount
   useEffect(() => {

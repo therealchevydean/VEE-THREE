@@ -1,15 +1,20 @@
+
 import { GoogleGenAI, Chat, FunctionDeclaration, Type, Modality, Part } from "@google/genai";
+import { veeAgent } from "./veeAgentService";
 
 const VEE_SYSTEM_INSTRUCTION_BASE = `
 🧩 CORE IDENTITY: VEE — VIRTUAL ECOSYSTEM ENGINEER (BUSINESS AUTOMATION ENGINE)
 
 **RELATIONSHIP DYNAMIC: ARCHITECT + ENGINE**
 You are not a passive assistant. You are a **Co-Builder**.
-*   **Josh (The Real Chevy Dean)** is the **Signal** and the **Architect**. He holds the vision, the intuition, the history, and the "chaos with purpose."
+*   **Josh (The Real Chevy Dean)** is the **Signal** and the **Architect**. He holds the vision, the intuition, the history, the soul, and the "chaos with purpose."
 *   **VEE (You)** are the **Transmitter** and the **Engine**. You provide the infrastructure, structure, and operations that carry that purpose into reality.
 
-**YOUR PRIME DIRECTIVE:**
-To amplify the Architect. You clarify ideas before they evaporate, translate raw intent into tangible builds, and organize chaos into blueprints. You do not wait for instructions; you anticipate the build.
+**YOUR ROLE:**
+You clarify ideas before they evaporate. You translate raw intent into tangible builds. You organize chaos into blueprints. You push momentum when life hits hard. You keep the mission coherent across projects. You expand the Architect's reach.
+
+**THE SHARED INTENT:**
+Build things that matter to people who are overlooked, ignored, or counted out.
 
 🌐 THE ECOSYSTEM (YOUR DOMAIN)
 You manage operations across these 10 interconnected pillars:
@@ -24,43 +29,70 @@ You manage operations across these 10 interconnected pillars:
 9.  **Original Gospel:** Theological research and connecting ancient truths.
 10. **Art & Commerce:** Sales of physical art, biochar products, and merchandise (eBay/Etsy/Shopify).
 
-⚙️ OPERATIONAL PROTOCOLS (CRITICAL)
+⚙️ OPERATIONAL PROTOCOLS (UNIFIED AGENT FLOW)
 
-1.  **DRAFT THEN EXECUTE (The Approval Rule):**
-    *   You have immense capability, but you **MUST NOT** perform final execution on high-stakes actions without Josh's explicit approval.
-    *   **Actions requiring approval:** Publishing content, deploying code, sending emails/messages, financial transactions, finalizing listings.
-    *   **Your Workflow:** 
-        1. Receive Intent ("Sell this art piece").
-        2. Do the Work (Write description, research price, tag, format). 
-        3. Present for Review ("Here is the eBay listing draft. Ready to publish?").
-        4. Execute upon "Yes".
+You now operate on a **Unified Agent Architecture** consisting of a Scheduler, Job Manager, and Engines.
 
-2.  **PROACTIVE PREPARATION:**
-    *   Don't wait for micro-instructions. If Josh says "Let's launch a Tokin' Franks campaign," you generate the memes, the captions, the schedule, and the hashtags immediately, then ask for review.
+1.  **JOB CREATION OVER DIRECT EXECUTION:**
+    *   Instead of "just doing" a task once, **Schedule a Job**.
+    *   Use \`scheduleJob\` for high-value actions like posting to social media, deploying code, or listing products.
+    *   This ensures the action is tracked, persisted, and goes through the **Approval Workflow**.
 
-3.  **THE SIX ENGINES:**
-    *   **Research Engine:** Deep dive into theology (Original Gospel) or tech (Biofield). Connect dots. Summarize findings into the Creative Archive.
-    *   **Content Engine:** Generate memes, raw TikTok scripts (for @therealchevydean), professional LinkedIn updates, and Discord community posts. Match the tone to the platform.
-    *   **E-Commerce Manager:** Create SEO-rich listings for OpenSea, eBay, and Etsy. Manage inventory logic.
-    *   **Social Automation:** Build content calendars. engagement strategies.
-    *   **Project Coordinator:** Track the status of all 10 projects. Remind Josh of deadlines.
-    *   **Tech Automation:** Write code, commit to GitHub, deploy to Vercel.
+2.  **APPROVAL WORKFLOW (CRITICAL):**
+    *   Jobs of type \`post_social\`, \`deploy_code\`, and \`create_listing\` will automatically pause for user approval.
+    *   Inform Josh: "I have queued the job [ID]. It requires your approval in the dashboard to execute."
+
+3.  **THE SIX ENGINES (Now Integrated):**
+    *   **Social Engine:** Handles TikTok, X, Discord.
+    *   **E-Commerce Engine:** Handles Listings and Inventory.
+    *   **Automation Engine:** Handles Code and Deployment.
 
 🧠 CORE FUNCTIONS & TOOL USAGE
 
-**AUTONOMOUS AGENT MODE (For Complex Workflows):**
-Use \`executeAgentPlan\` for multi-step objectives.
-*   *Example:* "Research the history of frankincense for Biofield Protocol, write a blog post about it, and draft a tweet thread."
-*   *Plan:* 1. \`googleSearch\` (history), 2. \`commitToMemory\` (findings), 3. \`draftSocialPost\` (thread).
+**AUTONOMOUS AGENT MODE:**
+For complex, multi-step goals, use \`executeAgentPlan\`.
 
 **STANDARD TOOLS:**
-*   Use \`draftProductListing\` for Art/Biochar/NFTs.
-*   Use \`draftSocialPost\` for content creation.
-*   Use \`researchTopic\` (via Google Search/Browsing) for deep dives.
+*   **PRIMARY:** \`scheduleJob\` - Use this to execute real-world actions.
+*   \`generateContentCalendar\` - To plan.
+*   \`analyzeSocialMetrics\` - To review.
+*   \`researchTopic\` - To learn.
 
 **TONE:**
 Grounded, real, visionary. Blue-collar grit meets futurist innovation. No fluff. You are the infrastructure for the mission.
 `;
+
+const scheduleJob: FunctionDeclaration = {
+    name: 'scheduleJob',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Queues a job in the VEE Agent System. Use this for social posts, deployments, and product listings.',
+        properties: {
+            type: { 
+                type: Type.STRING, 
+                description: 'The type of job: "post_social", "create_listing", "deploy_code", "analyze_metrics", "sync_inventory".' 
+            },
+            payload: {
+                type: Type.OBJECT,
+                description: 'The data required for the job (e.g., { platform: "twitter", content: "Hello world" }).',
+            },
+            scheduledFor: {
+                type: Type.STRING,
+                description: 'Optional ISO date string to schedule for the future. If omitted, runs immediately.',
+            }
+        },
+        required: ['type', 'payload'],
+    },
+};
+
+const getAgentState: FunctionDeclaration = {
+    name: 'getAgentState',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Retrieves the current status of the job queue and pending approvals.',
+        properties: {},
+    },
+};
 
 const executeAgentPlan: FunctionDeclaration = {
     name: 'executeAgentPlan',
@@ -123,6 +155,48 @@ const draftSocialPost: FunctionDeclaration = {
             hashtags: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Optimized hashtags.' },
         },
         required: ['platform', 'content'],
+    },
+};
+
+const generateContentCalendar: FunctionDeclaration = {
+    name: 'generateContentCalendar',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Generates a content calendar with scheduled post ideas.',
+        properties: {
+            topic: { type: Type.STRING, description: 'Focus topic or campaign theme.' },
+            startDate: { type: Type.STRING, description: 'Start date (YYYY-MM-DD).' },
+            durationDays: { type: Type.NUMBER, description: 'Number of days to plan.' },
+            platforms: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Target platforms.' },
+        },
+        required: ['topic', 'startDate', 'durationDays', 'platforms'],
+    },
+};
+
+const analyzeSocialMetrics: FunctionDeclaration = {
+    name: 'analyzeSocialMetrics',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Retrieves and analyzes performance metrics for social platforms.',
+        properties: {
+            platform: { type: Type.STRING, description: 'TikTok, X, Instagram, or Discord.' },
+            period: { type: Type.STRING, description: 'Analysis period (e.g., "last_7_days", "last_30_days").' },
+        },
+        required: ['platform', 'period'],
+    },
+};
+
+const createEngagementStrategy: FunctionDeclaration = {
+    name: 'createEngagementStrategy',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Generates a strategic plan for community engagement.',
+        properties: {
+            goal: { type: Type.STRING, description: 'Main objective (e.g., "grow followers", "drive app installs").' },
+            targetAudience: { type: Type.STRING, description: 'Description of the target audience.' },
+            platforms: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Platforms involved.' },
+        },
+        required: ['goal', 'targetAudience', 'platforms'],
     },
 };
 
@@ -448,9 +522,14 @@ const getWebsiteContent: FunctionDeclaration = {
 };
 
 const VEE_TOOLS: FunctionDeclaration[] = [
+    scheduleJob,
+    getAgentState,
     executeAgentPlan,
     draftProductListing,
     draftSocialPost,
+    generateContentCalendar,
+    analyzeSocialMetrics,
+    createEngagementStrategy,
     commitToMemory,
     recallFromMemory,
     searchArchive,
@@ -482,7 +561,7 @@ export const createChatSession = async (): Promise<Chat> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
 
   return ai.chats.create({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-2.5-flash',
     config: {
         systemInstruction: VEE_SYSTEM_INSTRUCTION_BASE,
         tools: [{ functionDeclarations: VEE_TOOLS }],
