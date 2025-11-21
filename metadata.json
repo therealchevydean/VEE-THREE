@@ -1,0 +1,9 @@
+{
+  "name": "VEE — Virtual Ecosystem Engineer",
+  "description": "A conversational AI architect and builder, trained on Josh Ewing’s creative archive, designed to bring the V3 Ecosystem and The Real Chevy Dean universe to life through conversation, automation, and code.",
+  "requestFramePermissions": [
+    "microphone",
+    "geolocation",
+    "camera"
+  ]
+}
