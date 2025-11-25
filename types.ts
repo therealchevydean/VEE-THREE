@@ -32,7 +32,6 @@ export interface AgentStep {
 
 export interface AgentPlan {
   goal: string;
-  // FIX: Corrected typo from `Agent-step[]` to `AgentStep[]`.
   steps: AgentStep[];
   status: 'running' | 'completed' | 'failed';
 }

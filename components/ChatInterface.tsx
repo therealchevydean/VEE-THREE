@@ -554,6 +554,31 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
                 }
             };
         }
+        case 'draftSocialPost': {
+            const { platform, content, visualDescription, hashtags } = args;
+            return {
+                status: 'success',
+                message: `Draft created for ${platform}.`,
+                draft: {
+                    content,
+                    visualDescription,
+                    hashtags
+                }
+            };
+        }
+        case 'draftProductListing': {
+            const { platform, title, description, price, tags } = args;
+            return {
+                status: 'success',
+                message: `Product listing draft created for ${platform}.`,
+                draft: {
+                    title,
+                    price,
+                    description,
+                    tags
+                }
+            };
+        }
         default:
             return { error: `Unknown tool: ${name}` };
     }

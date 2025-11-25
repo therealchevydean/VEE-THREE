@@ -219,7 +219,7 @@ class JobManager {
 
 class Scheduler {
     private jobManager: JobManager;
-    private timer: NodeJS.Timeout | null = null;
+    private timer: ReturnType<typeof setInterval> | null = null;
 
     constructor(manager: JobManager) {
         this.jobManager = manager;
