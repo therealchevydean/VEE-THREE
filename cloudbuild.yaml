@@ -33,7 +33,6 @@ steps:
       - 'us-west1'
       - '--platform'
       - 'managed'
-      - '--allow-unauthenticated'
 
 images:
   - 'gcr.io/$PROJECT_ID/vee-three:$SHORT_SHA'
