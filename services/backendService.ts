@@ -10,9 +10,9 @@ import { Connection, GithubRepo } from './authService';
  */
 
 const MOCK_USERNAMES = {
-    google: 'josh.ewing@v3.io',
-    github: 'therealchevydean',
-    vercel: 'josh-v3',
+    google: 'ewingjoshua.v3prototype@gmail.com',
+    github: 'ewingjoshua.v3prototype@gmail.com', // Assuming this email maps to your GitHub for the prototype
+    vercel: 'ewingjoshua.v3prototype@gmail.com',
 };
 
 // Simulate a database of tokens, which would be managed by the backend.
@@ -73,10 +73,11 @@ export const backendService = {
         // In a real backend, this would call the `apiProxyService` which uses the stored token.
         await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
         return [
-            { name: 'v3-app', url: `https://github.com/${tokenDatabase.github.username}/v3-app` },
-            { name: 'mobx-token-contracts', url: `https://github.com/${tokenDatabase.github.username}/mobx-token-contracts` },
-            { name: 'architect-revelations-site', url: `https://github.com/${tokenDatabase.github.username}/architect-revelations-site` },
-            { name: 'vee-ai-assistant', url: `https://github.com/${tokenDatabase.github.username}/vee-ai-assistant` },
+            { name: 'v3-app', url: `https://github.com/JoshEwing-V3/v3-app` },
+            { name: 'mobx-token-contracts', url: `https://github.com/JoshEwing-V3/mobx-token-contracts` },
+            { name: 'architect-revelations-site', url: `https://github.com/JoshEwing-V3/architect-revelations-site` },
+            { name: 'vee-ai-assistant', url: `https://github.com/JoshEwing-V3/vee-ai-assistant` },
+            { name: 'biofield-protocol-research', url: `https://github.com/JoshEwing-V3/biofield-protocol-research` },
         ];
     },
 };

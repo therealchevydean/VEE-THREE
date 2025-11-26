@@ -462,6 +462,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
                 return { status: 'success', message: `Simulated creating GitHub repo "${name}" for user ${isConnected.username}.`, url: `https://github.com/${isConnected.username}/${name}` };
             }
         }
+        case 'listGithubRepos': {
+             const isConnected = getConnection('github');
+             if (!isConnected) {
+                 return { status: 'error', message: "Action required: Please connect your GitHub account in the 'Connections' panel." };
+             } else {
+                 try {
+                     const repos = await getGithubRepos(isConnected);
+                     return { status: 'success', message: `Successfully fetched ${repos.length} repositories.`, repos: repos };
+                 } catch (e) {
+                     return { status: 'error', message: "Failed to list repositories. The service might be unavailable." };
+                 }
+             }
+        }
         case 'deployToVercel': {
             const isVercelConnected = getConnection('vercel');
             const isGithubConnected = getConnection('github');

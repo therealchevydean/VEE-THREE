@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Connection } from '../services/authService';
 
@@ -36,8 +37,13 @@ const ConnectionsManager: React.FC<ConnectionsManagerProps> = ({ isOpen, onClose
 
     const handleConnectClick = async (service: 'google' | 'github' | 'vercel') => {
         setLoadingService(service);
-        await onConnect(service);
-        setLoadingService(null);
+        try {
+            await onConnect(service);
+        } catch (error) {
+            console.error("Connection failed", error);
+        } finally {
+             setLoadingService(null);
+        }
     };
     
     if (!isOpen) return null;
@@ -46,7 +52,7 @@ const ConnectionsManager: React.FC<ConnectionsManagerProps> = ({ isOpen, onClose
         <div className="fixed inset-0 bg-black/70 z-40 flex items-center justify-center p-4 backdrop-blur-sm" onClick={onClose}>
             <div className="bg-gray-900 border border-gray-700/50 rounded-xl shadow-2xl w-full max-w-2xl flex flex-col" onClick={e => e.stopPropagation()}>
                 <header className="flex items-center justify-between p-4 border-b border-gray-700/50 flex-shrink-0">
-                    <h2 className="text-xl font-bold text-gray-100">Manage Connections</h2>
+                    <h2 className="text-xl font-bold text-gray-100">Manage Connections (Prototype)</h2>
                     <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white transition-colors" aria-label="Close connections manager">
                         <XMarkIcon className="w-6 h-6" />
                     </button>

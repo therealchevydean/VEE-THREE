@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Message, Role } from '../types';
 import AgentState from './AgentState';
@@ -13,7 +14,7 @@ const UserIcon: React.FC = () => (
 );
 
 const VeeIcon: React.FC = () => (
-    <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+    <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 border border-gray-600">
      <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-cyan-400">
        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5V15c0-.55.45-1 1-1s1 .45 1 1v1.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5V15h-1v1.5c0 .83-.67 1.5-1.5 1.5S9 17.33 9 16.5v-3c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V15h-1v-1.5c0-.28.22-.5.5-.5s.5.22.5.5V15c0 .55-.45 1-1 1s-1-.45-1-1v-1.5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v3c0 1.38-1.12 2.5-2.5 2.5S11 17.88 11 16.5z"/>
      </svg>
@@ -57,12 +58,12 @@ const GroundingSources: React.FC<{ sources: any[] }> = ({ sources }) => {
     if (parsedSources.length === 0) return null;
 
     return (
-        <div className="mt-3 border-t border-gray-600 pt-3">
-            <h4 className="text-xs font-semibold text-gray-400 mb-2">Sources:</h4>
+        <div className="mt-3 border-t border-gray-500 pt-3">
+            <h4 className="text-xs font-semibold text-gray-300 mb-2">Sources:</h4>
             <ul className="space-y-1.5 list-none p-0">
                 {parsedSources.map((source, index) => (
                     <li key={index} className="text-sm">
-                        <a href={source.uri} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline flex items-center gap-2">
+                        <a href={source.uri} target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:underline flex items-center gap-2">
                            <span className="truncate">{source.title}</span>
                         </a>
                     </li>
@@ -77,10 +78,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isLoading = message.role === Role.LOADING;
 
   const wrapperClasses = `group flex items-start gap-3 w-full ${isUser ? 'flex-row-reverse' : 'flex-row'}`;
-  const messageClasses = `max-w-xl p-4 rounded-2xl flex flex-col relative ${
+  
+  // High contrast for VEE: Lighter gray background, white text, and a border to separate from the main background.
+  const messageClasses = `max-w-xl p-4 rounded-2xl flex flex-col relative shadow-sm ${
     isUser
-      ? 'bg-indigo-600 text-white rounded-br-none'
-      : 'bg-gray-800 text-gray-200 rounded-bl-none'
+      ? 'bg-indigo-600 text-white rounded-br-none shadow-md'
+      : 'bg-gray-700 text-white border border-gray-600 rounded-bl-none shadow-md' 
   }`;
 
   return (
@@ -90,7 +93,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         {isLoading ? (
           <div className="flex items-center gap-3">
             <LoadingIndicator />
-            {message.content && <p className="text-gray-400 italic text-sm">{message.content}</p>}
+            {message.content && <p className="text-gray-300 italic text-sm">{message.content}</p>}
           </div>
         ) : (
           <>
@@ -102,20 +105,20 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                   <img 
                     src={message.imageUrl} 
                     alt="Generated content" 
-                    className="rounded-lg mb-2 max-w-full h-auto border border-gray-700" 
+                    className="rounded-lg mb-2 max-w-full h-auto border border-gray-500" 
                   />
                 )}
                 {message.videoUrl && (
                   <video 
                       src={message.videoUrl} 
                       controls 
-                      className="rounded-lg mb-2 max-w-full h-auto border border-gray-700"
+                      className="rounded-lg mb-2 max-w-full h-auto border border-gray-500"
                   >
                       Your browser does not support the video tag.
                   </video>
                 )}
                 {message.content && (
-                  <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: formatContent(message.content) }}></div>
+                  <div className="prose prose-invert prose-sm max-w-none text-gray-50" dangerouslySetInnerHTML={{ __html: formatContent(message.content) }}></div>
                 )}
                 {message.groundingSources && <GroundingSources sources={message.groundingSources} />}
               </>
@@ -125,7 +128,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         {message.files && message.files.length > 0 && (
             <div className="mt-3 border-t border-indigo-400/50 pt-3 space-y-2">
                 {message.files.map((file, index) => (
-                    <div key={index} className="flex items-center gap-2 text-xs text-indigo-200 bg-indigo-500/50 p-2 rounded-md">
+                    <div key={index} className="flex items-center gap-2 text-xs text-indigo-100 bg-indigo-500/50 p-2 rounded-md">
                         <DocumentIcon className="w-4 h-4 flex-shrink-0" />
                         <span className="truncate" title={file.name}>{file.name}</span>
                     </div>
@@ -157,14 +160,14 @@ const formatContent = (content: string) => {
         const lines = code.split('\n');
         const language = lines[0].trim();
         const codeContent = lines.slice(1).join('\n').trim();
-        return `<pre class="bg-gray-900 rounded-lg p-4 my-2 overflow-x-auto"><code class="language-${language}">${codeContent}</code></pre>`;
+        return `<pre class="bg-gray-900 border border-gray-600 rounded-lg p-4 my-2 overflow-x-auto"><code class="language-${language} text-gray-200">${codeContent}</code></pre>`;
     });
 
     // Inline code
-    formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-gray-700 text-cyan-300 rounded px-1.5 py-0.5">$1</code>');
+    formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-gray-800 border border-gray-600 text-cyan-300 rounded px-1.5 py-0.5">$1</code>');
     
     // Bold
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>');
     
     // Hyperlinks
     formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
@@ -174,15 +177,14 @@ const formatContent = (content: string) => {
                 ? `href="${url}"`
                 : `href="${url}" target="_blank" rel="noopener noreferrer"`;
             
-            return `<a ${attributes} class="text-indigo-400 hover:underline">${text}</a>`;
+            return `<a ${attributes} class="text-cyan-400 hover:text-cyan-300 hover:underline font-medium">${text}</a>`;
         }
-        // If protocol is not whitelisted, return the original text (which is already escaped)
         return match; 
     });
 
     // Lists
-    formatted = formatted.replace(/^\s*[-*]\s+(.*)/gm, '<li class="ml-4">$1</li>');
-    formatted = formatted.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+    formatted = formatted.replace(/^\s*[-*]\s+(.*)/gm, '<li class="ml-4 list-disc text-gray-100">$1</li>');
+    formatted = formatted.replace(/(<li>.*<\/li>)/gs, '<ul class="my-2">$1</ul>');
 
     // Newlines
     formatted = formatted.replace(/\n/g, '<br />');

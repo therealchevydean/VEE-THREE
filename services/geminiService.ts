@@ -57,6 +57,7 @@ For complex, multi-step goals, use \`executeAgentPlan\`.
 *   \`generateContentCalendar\` - To plan.
 *   \`analyzeSocialMetrics\` - To review.
 *   \`researchTopic\` - To learn.
+*   \`listGithubRepos\` - To check code status.
 
 **TONE:**
 Grounded, real, visionary. Blue-collar grit meets futurist innovation. No fluff. You are the infrastructure for the mission.
@@ -448,6 +449,16 @@ const createGithubPullRequest: FunctionDeclaration = {
     },
 };
 
+const listGithubRepos: FunctionDeclaration = {
+    name: 'listGithubRepos',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Lists the GitHub repositories for the connected user.',
+        properties: {},
+        required: [],
+    },
+};
+
 const readFile: FunctionDeclaration = {
     name: 'readFile',
     parameters: {
@@ -554,6 +565,7 @@ const VEE_TOOLS: FunctionDeclaration[] = [
     createGithubBranch,
     commitFileToGithub,
     createGithubPullRequest,
+    listGithubRepos,
 ];
 
 
