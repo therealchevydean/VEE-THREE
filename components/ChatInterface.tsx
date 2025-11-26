@@ -592,6 +592,35 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
                 }
             };
         }
+        case 'createEbayDraftListing': {
+            const { title, description, startPrice, conditionID, categoryId } = args;
+            // Simulated response for eBay Trading API 'AddFixedPriceItem'
+            return {
+                status: 'success',
+                message: `eBay Draft Listing Created: "${title}"`,
+                details: {
+                    itemId: `EBAY-DRAFT-${Math.floor(Math.random() * 1000000)}`,
+                    startPrice,
+                    categoryId,
+                    conditionID,
+                    status: 'Draft - Needs Review'
+                }
+            };
+        }
+        case 'searchEbayItems': {
+            const { keywords } = args;
+            // Simulated Finding API response
+            const mockItems = [
+                { title: `${keywords} - Rare`, price: '$45.00', bids: 3 },
+                { title: `Vintage ${keywords}`, price: '$120.00', bids: 0 },
+                { title: `New ${keywords} (Sealed)`, price: '$35.99', bids: 12 },
+            ];
+            return {
+                status: 'success',
+                message: `Found ${mockItems.length} items for "${keywords}".`,
+                items: mockItems
+            };
+        }
         default:
             return { error: `Unknown tool: ${name}` };
     }

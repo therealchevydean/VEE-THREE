@@ -120,7 +120,19 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                             {filteredFiles.map((file) => (
                                 <li key={file.id} className="flex items-center justify-between gap-x-6 py-3 group">
                                     <div className="flex min-w-0 gap-x-4 items-center flex-1">
-                                        <FileIcon className="h-8 w-8 flex-shrink-0 text-gray-400" />
+                                        {/* Thumbnail Preview Logic */}
+                                        {file.type.startsWith('image/') && file.content ? (
+                                            <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden border border-gray-600 bg-gray-800 relative">
+                                                <img 
+                                                    src={file.content} 
+                                                    alt={file.name} 
+                                                    className="h-full w-full object-cover" 
+                                                />
+                                            </div>
+                                        ) : (
+                                            <FileIcon className="h-10 w-10 flex-shrink-0 text-gray-400 p-1 bg-gray-800 rounded border border-gray-700/50" />
+                                        )}
+                                        
                                         {editingFile?.id === file.id ? (
                                             <input
                                                 ref={editInputRef}
@@ -135,7 +147,7 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                                             <div className="min-w-0 flex-auto">
                                                 <p className="text-sm font-semibold leading-6 text-gray-100">{file.name}</p>
                                                 <p className="mt-1 truncate text-xs leading-5 text-gray-400">
-                                                    {formatBytes(file.size)} - {new Date(file.uploadedAt).toLocaleDateString()}
+                                                    {formatBytes(file.size)} • {new Date(file.uploadedAt).toLocaleDateString()}
                                                 </p>
                                             </div>
                                         )}

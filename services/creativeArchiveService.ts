@@ -54,24 +54,35 @@ loadArchive();
 
 /**
  * Reads the content of a file and returns it as a string.
- * Returns null for non-text files.
+ * Supports text files (text content) and image files (base64 data URL).
  */
 const readFileContent = (file: File): Promise<string | null> => {
     return new Promise((resolve) => {
-        // Allow more text-like mimetypes for content reading
-        const textLikeTypes = ['text/', 'application/json', 'application/javascript', 'application/xml', 'application/x-typescript'];
-        if (!textLikeTypes.some(type => file.type.startsWith(type))) {
-            resolve(null);
+        // Handle Images for Preview
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target?.result as string);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(file);
             return;
         }
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            resolve(event.target?.result as string);
-        };
-        reader.onerror = () => {
-            resolve(null);
-        };
-        reader.readAsText(file);
+
+        // Handle Text-based files
+        const textLikeTypes = ['text/', 'application/json', 'application/javascript', 'application/xml', 'application/x-typescript'];
+        if (textLikeTypes.some(type => file.type.startsWith(type)) || file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+             const reader = new FileReader();
+            reader.onload = (event) => {
+                resolve(event.target?.result as string);
+            };
+            reader.onerror = () => {
+                resolve(null);
+            };
+            reader.readAsText(file);
+            return;
+        }
+
+        // Binary/Unsupported types
+        resolve(null);
     });
 };
 
@@ -144,7 +155,6 @@ export const renameFile = (id: string, newName: string): boolean => {
  */
 export const searchFiles = async (query: string): Promise<{ status: string; results: Partial<ArchivedFile>[] }> => {
     // Force a reload from localStorage to ensure the in-memory cache is not stale.
-    // This is the most robust way to ensure the tool has the latest data.
     loadArchive();
 
     console.log(`[Archive Sim]: Searching archive for "${query}"`);
@@ -154,7 +164,7 @@ export const searchFiles = async (query: string): Promise<{ status: string; resu
         .filter(file => 
             !lowerCaseQuery || // If query is empty/null, match everything
             file.name.toLowerCase().includes(lowerCaseQuery) ||
-            (file.content && file.content.toLowerCase().includes(lowerCaseQuery))
+            (file.type.startsWith('text') && file.content && file.content.toLowerCase().includes(lowerCaseQuery))
         )
         .map(file => ({
             id: file.id,
@@ -163,7 +173,7 @@ export const searchFiles = async (query: string): Promise<{ status: string; resu
             size: file.size,
             uploadedAt: file.uploadedAt,
             // Include a snippet of content if it's a text file and matches
-            contentSnippet: file.content ? file.content.substring(0, 150) + '...' : null
+            contentSnippet: (file.type.startsWith('text') && file.content) ? file.content.substring(0, 150) + '...' : null
         }));
         
     // Sort results by upload date, newest first

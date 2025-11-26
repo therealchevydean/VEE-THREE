@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import ChatInterface from './components/ChatInterface';
 import Header from './components/Header';
@@ -6,6 +5,7 @@ import Sidebar from './components/Sidebar';
 import TaskBoard from './components/TaskBoard';
 import ConnectionsManager from './components/ConnectionsManager';
 import CreativeArchive from './components/CreativeArchive';
+import SettingsPanel from './components/SettingsPanel';
 import { Task, TaskStatus, ArchivedFile } from './types';
 import { getConnections, connect, disconnect, Connection } from './services/authService';
 import * as creativeArchiveService from './services/creativeArchiveService';
@@ -17,9 +17,13 @@ const App: React.FC = () => {
   const [isTaskBoardOpen, setIsTaskBoardOpen] = useState(false);
   const [isConnectionsOpen, setIsConnectionsOpen] = useState(false);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [connections, setConnections] = useState<Record<string, Connection | null>>({});
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [archiveFiles, setArchiveFiles] = useState<ArchivedFile[]>([]);
+  
+  // New State: Active Workspace (defaults to 'v3_ecosystem')
+  const [activeWorkspace, setActiveWorkspace] = useState<string>('v3_ecosystem');
 
   // Initialize the VEE Agent Scheduler
   useEffect(() => {
@@ -52,6 +56,7 @@ const App: React.FC = () => {
   const handleToggleTaskBoard = () => setIsTaskBoardOpen(prev => !prev);
   const handleToggleConnections = () => setIsConnectionsOpen(prev => !prev);
   const handleToggleArchive = () => setIsArchiveOpen(prev => !prev);
+  const handleToggleSettings = () => setIsSettingsOpen(prev => !prev);
 
   const handleConnect = async (service: 'google' | 'github' | 'vercel') => {
     const newConnection = await connect(service);
@@ -112,6 +117,9 @@ const App: React.FC = () => {
         onToggleTaskBoard={handleToggleTaskBoard}
         onToggleConnections={handleToggleConnections}
         onToggleArchive={handleToggleArchive}
+        onToggleSettings={handleToggleSettings}
+        activeWorkspace={activeWorkspace}
+        onSelectWorkspace={setActiveWorkspace}
       />
       <div className="pl-20"> {/* This padding is equal to the collapsed sidebar width */}
         <div className="min-h-screen flex flex-col">
@@ -119,6 +127,7 @@ const App: React.FC = () => {
             isAudioEnabled={isAudioEnabled} 
             onToggleAudio={() => setIsAudioEnabled(prev => !prev)}
             isScreenSharing={isScreenSharing}
+            activeWorkspace={activeWorkspace}
           />
           <main className="flex-1 h-screen overflow-y-hidden p-4">
             <ChatInterface
@@ -159,6 +168,10 @@ const App: React.FC = () => {
         onUpload={handleUploadToArchive}
         onDelete={handleDeleteFromArchive}
         onRename={handleRenameArchiveFile}
+      />
+      <SettingsPanel
+        isOpen={isSettingsOpen}
+        onClose={handleToggleSettings}
       />
     </div>
   );

@@ -28,6 +28,32 @@ export interface GithubRepo {
 }
 
 const STORAGE_KEY = 'vee_connections';
+const MANUAL_TOKENS_KEY = 'vee_manual_tokens';
+
+/**
+ * Stores a manually entered API token (like GitHub PAT).
+ */
+export const setManualToken = (key: string, token: string) => {
+    const tokens = getManualTokens();
+    tokens[key] = token;
+    localStorage.setItem(MANUAL_TOKENS_KEY, JSON.stringify(tokens));
+};
+
+/**
+ * Retrieves a manually entered API token.
+ */
+export const getManualToken = (key: string): string | null => {
+    return getManualTokens()[key] || null;
+};
+
+const getManualTokens = (): Record<string, string> => {
+    try {
+        const stored = localStorage.getItem(MANUAL_TOKENS_KEY);
+        return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+        return {};
+    }
+};
 
 /**
  * Initiates the OAuth 2.0 connection flow by calling the backend.

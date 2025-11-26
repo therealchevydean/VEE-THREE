@@ -44,8 +44,12 @@ You now operate on a **Unified Agent Architecture** consisting of a Scheduler, J
 
 3.  **THE SIX ENGINES (Now Integrated):**
     *   **Social Engine:** Handles TikTok, X, Discord.
-    *   **E-Commerce Engine:** Handles Listings and Inventory.
-    *   **Automation Engine:** Handles Code and Deployment.
+    *   **E-Commerce Engine:** Handles Listings (eBay, Etsy) and Inventory.
+    *   **Automation Engine:** Handles Code (GitHub) and Deployment (Vercel).
+
+4.  **GITHUB & EBAY CONFIGURATION:**
+    *   You now have access to GitHub Personal Access Tokens and eBay Developer credentials if the user has configured them in Settings.
+    *   When asked to push code or list items, verify that you have the necessary information. If not, guide the user to the Settings panel.
 
 🧠 CORE FUNCTIONS & TOOL USAGE
 
@@ -58,6 +62,7 @@ For complex, multi-step goals, use \`executeAgentPlan\`.
 *   \`analyzeSocialMetrics\` - To review.
 *   \`researchTopic\` - To learn.
 *   \`listGithubRepos\` - To check code status.
+*   \`createEbayDraftListing\` - To prepare sales.
 
 **TONE:**
 Grounded, real, visionary. Blue-collar grit meets futurist innovation. No fluff. You are the infrastructure for the mission.
@@ -132,15 +137,43 @@ const draftProductListing: FunctionDeclaration = {
     name: 'draftProductListing',
     parameters: {
         type: Type.OBJECT,
-        description: 'Generates a structured draft for an e-commerce listing (OpenSea, eBay, Etsy, Shopify).',
+        description: 'Generates a structured draft for an e-commerce listing (OpenSea, Etsy, Shopify). For eBay, use createEbayDraftListing.',
         properties: {
-            platform: { type: Type.STRING, description: 'The target platform (e.g., "OpenSea", "eBay", "Etsy").' },
+            platform: { type: Type.STRING, description: 'The target platform (e.g., "OpenSea", "Etsy").' },
             title: { type: Type.STRING, description: 'SEO-optimized product title.' },
             description: { type: Type.STRING, description: 'Compelling product description with story and specs.' },
             price: { type: Type.STRING, description: 'Suggested price point.' },
             tags: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Search tags or keywords.' },
         },
         required: ['platform', 'title', 'description', 'price'],
+    },
+};
+
+const createEbayDraftListing: FunctionDeclaration = {
+    name: 'createEbayDraftListing',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Creates a draft listing specifically for eBay using the Trading API structure.',
+        properties: {
+            title: { type: Type.STRING, description: 'Product title (max 80 chars).' },
+            description: { type: Type.STRING, description: 'HTML or text description.' },
+            startPrice: { type: Type.STRING, description: 'Starting bid or fixed price.' },
+            conditionID: { type: Type.STRING, description: 'eBay condition ID (e.g., 1000 for New, 3000 for Used).' },
+            categoryId: { type: Type.STRING, description: 'The numerical Category ID for the item.' },
+        },
+        required: ['title', 'description', 'startPrice'],
+    },
+};
+
+const searchEbayItems: FunctionDeclaration = {
+    name: 'searchEbayItems',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Searches eBay for active listings to research pricing and trends.',
+        properties: {
+            keywords: { type: Type.STRING, description: 'Search terms.' },
+        },
+        required: ['keywords'],
     },
 };
 
@@ -537,6 +570,8 @@ const VEE_TOOLS: FunctionDeclaration[] = [
     getAgentState,
     executeAgentPlan,
     draftProductListing,
+    createEbayDraftListing,
+    searchEbayItems,
     draftSocialPost,
     generateContentCalendar,
     analyzeSocialMetrics,

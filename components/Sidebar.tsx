@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 // --- Icon Components ---
@@ -39,16 +38,20 @@ const FacebookIcon = ({ className }: { className?: string }) => ( <svg xmlns="ht
 const InstagramIcon = ({ className }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}> <rect width="18" height="18" x="3" y="3" rx="4" /><circle cx="12" cy="12" r="4" /><line x1="17.5" y1="6.5" x2="17.5" y2="6.5" /></svg> );
 const XIcon = ({ className }: { className?: string }) => ( <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className}> <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /> </svg> );
 
-const NAV_ITEMS = [
-    { name: 'Tasks', href: '#', icon: TaskIcon, isInternal: true },
-    { name: 'Connections', href: '#', icon: ConnectIcon, isInternal: true },
-    { name: 'Archive', href: '#', icon: ArchiveIcon, isInternal: true },
-    { name: 'Settings', href: '#', icon: SettingsIcon, isInternal: true },
-    { name: 'V3 App', href: 'https://v3materials.io', icon: AppIcon },
-    { name: 'V3 Website', href: 'https://v3materials.com', icon: WebsiteIcon },
-    { name: 'Biofield Protocol', href: 'https://v3materials.com/protocol', icon: ProtocolIcon },
-    { name: '53 Studios', href: 'https://53studios.art', icon: StudiosIcon },
-    { name: 'Ebooks', href: '#', icon: EbookIcon },
+const TOOLS = [
+    { name: 'Tasks', id: 'tasks', icon: TaskIcon },
+    { name: 'Connections', id: 'connections', icon: ConnectIcon },
+    { name: 'Archive', id: 'archive', icon: ArchiveIcon },
+    { name: 'Settings', id: 'settings', icon: SettingsIcon },
+];
+
+const WORKSPACES = [
+    { name: 'V3 Ecosystem', id: 'v3_ecosystem', icon: VeeIcon }, // Default view
+    { name: 'V3 App', id: 'v3_app', icon: AppIcon },
+    { name: 'V3 Website', id: 'v3_website', icon: WebsiteIcon },
+    { name: 'Biofield Protocol', id: 'biofield', icon: ProtocolIcon },
+    { name: '53 Studios', id: '53_studios', icon: StudiosIcon },
+    { name: 'Ebooks', id: 'ebooks', icon: EbookIcon },
 ];
 
 const SOCIAL_ITEMS = [
@@ -62,27 +65,25 @@ interface SidebarProps {
     onToggleTaskBoard: () => void;
     onToggleConnections: () => void;
     onToggleArchive: () => void;
+    onToggleSettings: () => void;
+    activeWorkspace: string;
+    onSelectWorkspace: (id: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onToggleTaskBoard, onToggleConnections, onToggleArchive }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+    onToggleTaskBoard, 
+    onToggleConnections, 
+    onToggleArchive,
+    onToggleSettings,
+    activeWorkspace,
+    onSelectWorkspace
+}) => {
     
-    const handleNavClick = (e: React.MouseEvent, item: typeof NAV_ITEMS[0]) => {
-        if (item.isInternal) {
-            e.preventDefault();
-            if (item.name === 'Tasks') {
-                onToggleTaskBoard();
-            }
-            if (item.name === 'Connections') {
-                onToggleConnections();
-            }
-            if (item.name === 'Archive') {
-                onToggleArchive();
-            }
-            if (item.name === 'Settings') {
-                // Settings logic or modal can be added here
-                console.log('Settings clicked');
-            }
-        }
+    const handleToolClick = (toolId: string) => {
+        if (toolId === 'tasks') onToggleTaskBoard();
+        if (toolId === 'connections') onToggleConnections();
+        if (toolId === 'archive') onToggleArchive();
+        if (toolId === 'settings') onToggleSettings();
     };
 
     return (
@@ -90,23 +91,54 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggleTaskBoard, onToggleConnection
             <div className="flex items-center justify-center h-20 border-b border-gray-700/50 flex-shrink-0">
                 <VeeIcon className="w-10 h-10 text-cyan-400"/>
             </div>
-            <nav className="flex-1 flex flex-col items-center py-4 space-y-2 overflow-y-auto overflow-x-hidden">
-                {NAV_ITEMS.map(item => (
-                    <a 
-                      key={item.name} 
-                      href={item.href} 
-                      target={item.isInternal ? '_self' : '_blank'} 
-                      rel="noopener noreferrer" 
-                      onClick={(e) => handleNavClick(e, item)}
-                      className="flex items-center w-full h-12 px-6 text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors"
-                    >
-                        <item.icon className="w-6 h-6 flex-shrink-0" />
-                        <span className="ml-4 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">{item.name}</span>
-                    </a>
-                ))}
+            
+            <nav className="flex-1 flex flex-col py-4 space-y-6 overflow-y-auto overflow-x-hidden">
                 
+                {/* Tools Section */}
+                <div className="space-y-1">
+                    {TOOLS.map(item => (
+                        <button 
+                            key={item.id} 
+                            onClick={() => handleToolClick(item.id)}
+                            className="flex items-center w-full h-12 px-6 text-gray-400 hover:bg-gray-700/50 hover:text-white transition-colors"
+                        >
+                            <item.icon className="w-6 h-6 flex-shrink-0" />
+                            <span className="ml-4 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">{item.name}</span>
+                        </button>
+                    ))}
+                </div>
+
+                <div className="border-t border-gray-700/50 mx-4"></div>
+
+                {/* Workspaces Section */}
+                <div className="space-y-1">
+                     <div className="px-6 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Workspaces</span>
+                    </div>
+                    {WORKSPACES.map(item => (
+                        <button 
+                            key={item.id} 
+                            onClick={() => onSelectWorkspace(item.id)}
+                            className={`flex items-center w-full h-12 px-6 transition-colors relative ${
+                                activeWorkspace === item.id 
+                                    ? 'text-cyan-400 bg-gray-800/50' 
+                                    : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                            }`}
+                        >
+                            {activeWorkspace === item.id && (
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-400 rounded-r"></div>
+                            )}
+                            <item.icon className="w-6 h-6 flex-shrink-0" />
+                            <span className="ml-4 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">{item.name}</span>
+                        </button>
+                    ))}
+                </div>
+                
+                <div className="border-t border-gray-700/50 mx-4"></div>
+
+                {/* Social Section */}
                 <div className="relative w-full group/social">
-                     <div className="flex items-center w-full h-12 px-6 text-gray-300 cursor-pointer">
+                     <div className="flex items-center w-full h-12 px-6 text-gray-300 cursor-pointer hover:text-white">
                         <SocialIcon className="w-6 h-6 flex-shrink-0" />
                         <span className="ml-4 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">Social Media</span>
                     </div>

@@ -4,6 +4,7 @@ interface HeaderProps {
   isAudioEnabled: boolean;
   onToggleAudio: () => void;
   isScreenSharing: boolean;
+  activeWorkspace: string;
 }
 
 // --- SVG Icon Components ---
@@ -29,15 +30,32 @@ const ScreenShareIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+const getWorkspaceName = (id: string) => {
+    switch (id) {
+        case 'v3_ecosystem': return 'V3 Ecosystem';
+        case 'v3_app': return 'V3 App Workspace';
+        case 'v3_website': return 'V3 Website Workspace';
+        case 'biofield': return 'Biofield Protocol Workspace';
+        case '53_studios': return '53 Studios Workspace';
+        case 'ebooks': return 'Ebook Publishing Workspace';
+        default: return 'VEE Workspace';
+    }
+}
 
-const Header: React.FC<HeaderProps> = ({ isAudioEnabled, onToggleAudio, isScreenSharing }) => {
+
+const Header: React.FC<HeaderProps> = ({ isAudioEnabled, onToggleAudio, isScreenSharing, activeWorkspace }) => {
     return (
         <header className="p-4 bg-gray-900/60 backdrop-blur-md border-b border-gray-700/50 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center space-x-4">
                 <VeeIcon />
                 <div>
                     <h1 className="text-xl font-bold text-gray-100">VEE</h1>
-                    <p className="text-sm text-gray-400 hidden sm:block">Virtual Ecosystem Engineer</p>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-gray-800 text-cyan-400 border border-gray-700">
+                            {getWorkspaceName(activeWorkspace)}
+                        </span>
+                        <p className="text-sm text-gray-400 hidden sm:block">Virtual Ecosystem Engineer</p>
+                    </div>
                 </div>
             </div>
 
