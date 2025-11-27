@@ -74,7 +74,10 @@ export type JobType =
   | 'create_listing' 
   | 'deploy_code' 
   | 'analyze_metrics' 
-  | 'sync_inventory';
+  | 'sync_inventory'
+  | 'ebay_reprice'    // NEW
+  | 'ebay_sync_orders' // NEW
+  | 'ebay_bulk_list';  // NEW
 
 export type JobStatus = 'pending' | 'processing' | 'awaiting_approval' | 'completed' | 'failed';
 
@@ -93,4 +96,35 @@ export interface AgentStateSnapshot {
     queue: Job[];
     pendingApprovals: Job[];
     history: Job[];
+}
+
+// --- EBAY SPECIFIC TYPES ---
+
+export type PricingStrategy = 'match_lowest' | 'undercut_competitor' | 'fixed_margin';
+
+export interface PricingRule {
+    sku: string;
+    minPrice: number;
+    maxPrice: number;
+    strategy: PricingStrategy;
+    competitorUrl?: string;
+}
+
+export interface EbayItem {
+    sku: string;
+    title: string;
+    currentPrice: number;
+    quantity: number;
+    status: 'Active' | 'Draft' | 'Ended';
+    views: number;
+    pricingRule?: PricingRule;
+}
+
+export interface EbayOrder {
+    orderId: string;
+    buyer: string;
+    total: number;
+    status: 'Paid' | 'Shipped' | 'Delivered' | 'Cancelled';
+    items: { sku: string, title: string, qty: number }[];
+    orderDate: string;
 }

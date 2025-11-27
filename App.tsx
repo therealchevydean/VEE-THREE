@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import ChatInterface from './components/ChatInterface';
 import Header from './components/Header';
@@ -6,6 +7,7 @@ import TaskBoard from './components/TaskBoard';
 import ConnectionsManager from './components/ConnectionsManager';
 import CreativeArchive from './components/CreativeArchive';
 import SettingsPanel from './components/SettingsPanel';
+import EbayDashboard from './components/EbayDashboard';
 import { Task, TaskStatus, ArchivedFile } from './types';
 import { getConnections, connect, disconnect, Connection } from './services/authService';
 import * as creativeArchiveService from './services/creativeArchiveService';
@@ -18,6 +20,7 @@ const App: React.FC = () => {
   const [isConnectionsOpen, setIsConnectionsOpen] = useState(false);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isEbayOpen, setIsEbayOpen] = useState(false);
   const [connections, setConnections] = useState<Record<string, Connection | null>>({});
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [archiveFiles, setArchiveFiles] = useState<ArchivedFile[]>([]);
@@ -57,6 +60,7 @@ const App: React.FC = () => {
   const handleToggleConnections = () => setIsConnectionsOpen(prev => !prev);
   const handleToggleArchive = () => setIsArchiveOpen(prev => !prev);
   const handleToggleSettings = () => setIsSettingsOpen(prev => !prev);
+  const handleToggleEbay = () => setIsEbayOpen(prev => !prev);
 
   const handleConnect = async (service: 'google' | 'github' | 'vercel') => {
     const newConnection = await connect(service);
@@ -118,6 +122,7 @@ const App: React.FC = () => {
         onToggleConnections={handleToggleConnections}
         onToggleArchive={handleToggleArchive}
         onToggleSettings={handleToggleSettings}
+        onToggleEbay={handleToggleEbay}
         activeWorkspace={activeWorkspace}
         onSelectWorkspace={setActiveWorkspace}
       />
@@ -172,6 +177,10 @@ const App: React.FC = () => {
       <SettingsPanel
         isOpen={isSettingsOpen}
         onClose={handleToggleSettings}
+      />
+      <EbayDashboard 
+        isOpen={isEbayOpen}
+        onClose={handleToggleEbay}
       />
     </div>
   );

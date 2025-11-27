@@ -39,13 +39,14 @@ You now operate on a **Unified Agent Architecture** consisting of a Scheduler, J
     *   This ensures the action is tracked, persisted, and goes through the **Approval Workflow**.
 
 2.  **APPROVAL WORKFLOW (CRITICAL):**
-    *   Jobs of type \`post_social\`, \`deploy_code\`, and \`create_listing\` will automatically pause for user approval.
+    *   Jobs of type \`post_social\`, \`deploy_code\`, \`create_listing\`, and \`ebay_bulk_list\` will automatically pause for user approval.
     *   Inform Josh: "I have queued the job [ID]. It requires your approval in the dashboard to execute."
 
-3.  **THE SIX ENGINES (Now Integrated):**
+3.  **THE ENGINES (Now Integrated):**
     *   **Social Engine:** Handles TikTok, X, Discord.
     *   **E-Commerce Engine:** Handles Listings (eBay, Etsy) and Inventory.
     *   **Automation Engine:** Handles Code (GitHub) and Deployment (Vercel).
+    *   **eBay Engine:** Handles Repricing, Order Syncing, and Bulk Drafts.
 
 4.  **GITHUB & EBAY CONFIGURATION:**
     *   You now have access to GitHub Personal Access Tokens and eBay Developer credentials if the user has configured them in Settings.
@@ -58,8 +59,8 @@ For complex, multi-step goals, use \`executeAgentPlan\`.
 
 **STANDARD TOOLS:**
 *   **PRIMARY:** \`scheduleJob\` - Use this to execute real-world actions.
-*   \`generateContentCalendar\` - To plan.
-*   \`analyzeSocialMetrics\` - To review.
+*   \`getEbayOrders\` - To check sales.
+*   \`updateEbayPricingRule\` - To set repricing strategies.
 *   \`researchTopic\` - To learn.
 *   \`listGithubRepos\` - To check code status.
 *   \`createEbayDraftListing\` - To prepare sales.
@@ -76,7 +77,7 @@ const scheduleJob: FunctionDeclaration = {
         properties: {
             type: { 
                 type: Type.STRING, 
-                description: 'The type of job: "post_social", "create_listing", "deploy_code", "analyze_metrics", "sync_inventory".' 
+                description: 'The type of job: "post_social", "create_listing", "deploy_code", "analyze_metrics", "sync_inventory", "ebay_reprice", "ebay_sync_orders", "ebay_bulk_list".' 
             },
             payload: {
                 type: Type.OBJECT,
@@ -174,6 +175,31 @@ const searchEbayItems: FunctionDeclaration = {
             keywords: { type: Type.STRING, description: 'Search terms.' },
         },
         required: ['keywords'],
+    },
+};
+
+const getEbayOrders: FunctionDeclaration = {
+    name: 'getEbayOrders',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Retrieves recent sales/orders from eBay.',
+        properties: {},
+        required: [],
+    },
+};
+
+const updateEbayPricingRule: FunctionDeclaration = {
+    name: 'updateEbayPricingRule',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Updates the repricing strategy for a specific SKU.',
+        properties: {
+            sku: { type: Type.STRING },
+            minPrice: { type: Type.NUMBER },
+            maxPrice: { type: Type.NUMBER },
+            strategy: { type: Type.STRING, description: 'match_lowest, undercut_competitor, or fixed_margin' }
+        },
+        required: ['sku', 'minPrice', 'maxPrice', 'strategy'],
     },
 };
 
@@ -572,6 +598,8 @@ const VEE_TOOLS: FunctionDeclaration[] = [
     draftProductListing,
     createEbayDraftListing,
     searchEbayItems,
+    getEbayOrders,
+    updateEbayPricingRule,
     draftSocialPost,
     generateContentCalendar,
     analyzeSocialMetrics,

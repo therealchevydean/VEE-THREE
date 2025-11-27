@@ -8,6 +8,7 @@ import * as localFileService from '../services/localFileService';
 import * as webBrowserService from '../services/webBrowserService';
 import * as creativeArchiveService from '../services/creativeArchiveService';
 import { veeAgent } from '../services/veeAgentService';
+import { ebayService } from '../services/ebayService';
 import { Message, Role, Task, TaskStatus, AgentPlan, AgentStep, AgentStepStatus, JobType } from '../types';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
@@ -85,7 +86,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
         if (message.includes('deadline exceeded')) {
             return `The request for ${context} timed out. The service may be busy. Please try again in a moment.`;
         }
-        // For other errors, provide a generic message. Logging the full error is handled in the catch block.
         return `${baseMessage} Please try again.`;
     }
 
@@ -141,7 +141,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
       if (storedMessages) {
         setMessages(JSON.parse(storedMessages));
       } else {
-        // If no history, set the initial message
         setMessages([
           {
             role: Role.MODEL,
@@ -151,7 +150,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
       }
     } catch (error) {
       console.error("Failed to load messages from localStorage:", error);
-      // Fallback to initial message on error
       setMessages([
         {
           role: Role.MODEL,
@@ -186,13 +184,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
   }, []);
 
   useEffect(() => {
-    // Auto-scroll to the latest message
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   useEffect(() => {
     return () => {
-        // Cleanup screen sharing stream on component unmount
         if (screenStream) {
             screenStream.getTracks().forEach(track => track.stop());
         }
@@ -274,7 +270,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            // Return base64 string without the 'data:image/jpeg;base64,' prefix
             return canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
           }
       }
@@ -319,15 +314,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
     
     const mailtoLink = `mailto:${toFormatted}?${queryParts.join('&')}`;
     
-    // Construct a message that confirms who is being emailed, but respects BCC privacy.
-    const toRecipients = `To: ${to.join(', ')}`;
-    const ccRecipients = (cc && cc.length > 0) ? `Cc: ${cc.join(', ')}` : null;
-    let recipientSummary = toRecipients;
-    if (ccRecipients) {
-        recipientSummary += `; ${ccRecipients}`;
-    }
-
-    const message = `I've drafted an email for you (${recipientSummary}). Click the link below to open it in your default email client for review and sending.`;
+    const message = `I've drafted an email for you. Click the link below to open it in your default email client for review and sending.`;
 
     return {
         status: 'success',
@@ -386,6 +373,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
                 pendingApprovals: snapshot.pendingApprovals.length,
                 recentHistory: snapshot.history.slice(-3) // Only return recent 3
             };
+        }
+        case 'getEbayOrders': {
+            const orders = await ebayService.getOrders();
+            return { status: 'success', message: `Retrieved ${orders.length} orders.`, orders };
+        }
+        case 'updateEbayPricingRule': {
+            await ebayService.updatePricingRule(args as any);
+            return { status: 'success', message: `Pricing rule updated for SKU: ${args.sku}.` };
+        }
+        case 'createEbayDraftListing': {
+            const sku = await ebayService.createDraft(args);
+            return { status: 'success', message: `Draft listing created with SKU: ${sku}.` };
         }
         case 'commitToMemory':
             return await commit(args.data as string);
@@ -592,24 +591,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
                 }
             };
         }
-        case 'createEbayDraftListing': {
-            const { title, description, startPrice, conditionID, categoryId } = args;
-            // Simulated response for eBay Trading API 'AddFixedPriceItem'
-            return {
-                status: 'success',
-                message: `eBay Draft Listing Created: "${title}"`,
-                details: {
-                    itemId: `EBAY-DRAFT-${Math.floor(Math.random() * 1000000)}`,
-                    startPrice,
-                    categoryId,
-                    conditionID,
-                    status: 'Draft - Needs Review'
-                }
-            };
-        }
         case 'searchEbayItems': {
             const { keywords } = args;
-            // Simulated Finding API response
             const mockItems = [
                 { title: `${keywords} - Rare`, price: '$45.00', bids: 3 },
                 { title: `Vintage ${keywords}`, price: '$120.00', bids: 0 },
@@ -633,40 +616,33 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
     for (let i = 0; i < plan.steps.length; i++) {
         const step = plan.steps[i];
         
-        // Update UI: Mark step as in-progress
         finalPlanState = { ...finalPlanState, steps: finalPlanState.steps.map(s => s.id === step.id ? { ...s, status: AgentStepStatus.IN_PROGRESS } : s) };
         setMessages(prev => prev.map(msg => msg.agentPlan?.goal === plan.goal ? { ...msg, agentPlan: finalPlanState } : msg));
 
         try {
-            // Execute the tool for the current step
             const result: any = await executeTool(step.name, step.args);
             
-            // Handle tool execution error
             if (result.status === 'error') {
                 throw new Error(result.message);
             }
 
-            // Update UI: Mark step as completed
             finalPlanState = { ...finalPlanState, steps: finalPlanState.steps.map(s => s.id === step.id ? { ...s, status: AgentStepStatus.COMPLETED, result } : s) };
             setMessages(prev => prev.map(msg => msg.agentPlan?.goal === plan.goal ? { ...msg, agentPlan: finalPlanState } : msg));
 
         } catch (error) {
             console.error(`Agent step '${step.name}' failed:`, error);
-            // Update UI: Mark step as failed and stop execution
             finalPlanState = { ...finalPlanState, status: 'failed', steps: finalPlanState.steps.map(s => s.id === step.id ? { ...s, status: AgentStepStatus.FAILED, result: { error: (error as Error).message } } : s) };
             setMessages(prev => prev.map(msg => msg.agentPlan?.goal === plan.goal ? { ...msg, agentPlan: finalPlanState } : msg));
-            return finalPlanState; // End execution
+            return finalPlanState;
         }
     }
 
-    // Mark the whole plan as completed
     finalPlanState = { ...finalPlanState, status: 'completed' };
     setMessages(prev => prev.map(msg => msg.agentPlan?.goal === plan.goal ? { ...msg, agentPlan: finalPlanState } : msg));
     return finalPlanState;
   };
 
   const handleToolCalls = async (functionCalls: FunctionCall[]) => {
-    // Check for agent plan execution first
     const agentCall = functionCalls.find(fc => fc.name === 'executeAgentPlan');
     if (agentCall && agentCall.args.plan) {
         const { goal, plan: planSteps } = agentCall.args as { goal: string, plan: { name: string, args: any }[] };
@@ -683,15 +659,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
         
         const agentMessage: Message = {
             role: Role.MODEL,
-            content: '', // Content is handled by the agent plan renderer
+            content: '',
             agentPlan: newPlan,
         };
         setMessages(prev => [...prev.slice(0, -1), agentMessage]);
 
-        // Asynchronously run the plan
         const finalPlanState = await runAgentPlan(newPlan);
 
-        // Send a final result back to the model so it can respond
         const planResult = {
             status: finalPlanState.status,
             message: finalPlanState.status === 'completed' ? `Plan for goal "${goal}" executed successfully.` : `Plan for goal "${goal}" failed.`,
@@ -701,7 +675,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
         return [{ functionResponse: { name: 'executeAgentPlan', response: { result: JSON.stringify(planResult) } } }];
     }
 
-    // Standard tool call handling for non-agent requests
     const toolResponseParts = [];
     for (const fc of functionCalls) {
         const result = await executeTool(fc.name, fc.args);
@@ -931,12 +904,9 @@ const handleDefaultChat = async (userInput: string, files: File[], screenFrame: 
       
       if (response.functionCalls && response.functionCalls.length > 0) {
         const toolResponseParts = await handleToolCalls(response.functionCalls);
-        // If an agent plan was started, handleToolCalls doesn't return parts to send back immediately.
-        // It manages the conversation flow itself.
         if (toolResponseParts) {
             response = await chatSessionRef.current.sendMessage({ message: toolResponseParts });
         } else {
-            // Agent plan is running, so we just return and let it update the UI.
             return;
         }
       }

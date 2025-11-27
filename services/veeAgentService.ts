@@ -1,6 +1,7 @@
 
 import { Job, JobType, JobStatus, AgentStateSnapshot } from '../types';
 import { commit } from './memoryService';
+import { ebayService } from './ebayService';
 
 /**
  * =================================================================
@@ -10,7 +11,7 @@ import { commit } from './memoryService';
  * Implements the architecture defined in "Unified Agent Flow for VEE":
  * 1. Scheduler (Cron-like)
  * 2. Job Manager (Queue & Approvals)
- * 3. Engines (Social, E-Com, Automation)
+ * 3. Engines (Social, E-Com, Automation, eBay)
  */
 
 // --- 1. THE ENGINES ---
@@ -50,6 +51,57 @@ class AutomationEngine {
     }
 }
 
+class EbayEngine {
+    // Job: "Reprice Nightly"
+    async executeRepricing(): Promise<string> {
+        console.log(`[EbayEngine] Starting Repricing Run...`);
+        const inventory = await ebayService.getInventory();
+        let updates = 0;
+
+        for (const item of inventory) {
+            if (item.pricingRule) {
+                // LOGIC: VEE Brain would determine this, but here is a simple algorithm
+                // In production, call eBay Browse API to find competitor price
+                const simulatedCompetitorPrice = item.currentPrice - (Math.random() > 0.5 ? 2 : -2); 
+                
+                let newPrice = item.currentPrice;
+
+                if (item.pricingRule.strategy === 'undercut_competitor') {
+                    newPrice = simulatedCompetitorPrice - 0.50;
+                } else if (item.pricingRule.strategy === 'match_lowest') {
+                    newPrice = simulatedCompetitorPrice;
+                }
+
+                // Enforce Floor/Ceiling
+                if (newPrice < item.pricingRule.minPrice) newPrice = item.pricingRule.minPrice;
+                if (newPrice > item.pricingRule.maxPrice) newPrice = item.pricingRule.maxPrice;
+
+                if (newPrice !== item.currentPrice) {
+                    await ebayService.updatePrice(item.sku, Number(newPrice.toFixed(2)));
+                    updates++;
+                }
+            }
+        }
+        return `Repricing Complete. Updated ${updates} SKUs.`;
+    }
+
+    // Job: "Sync Orders Hourly"
+    async syncOrders(): Promise<string> {
+        console.log(`[EbayEngine] Syncing Orders...`);
+        const orders = await ebayService.getOrders();
+        // In production, we would save these to a database
+        return `Sync Complete. Processed ${orders.length} orders.`;
+    }
+
+    async createBulkListings(items: any[]): Promise<string> {
+        console.log(`[EbayEngine] Bulk creating ${items.length} drafts...`);
+        for (const item of items) {
+            await ebayService.createDraft(item);
+        }
+        return `Bulk List Complete. Created ${items.length} drafts.`;
+    }
+}
+
 // --- 2. THE JOB MANAGER ---
 
 class JobManager {
@@ -58,6 +110,7 @@ class JobManager {
     private socialEngine = new SocialMediaEngine();
     private ecomEngine = new EcommerceEngine();
     private autoEngine = new AutomationEngine();
+    private ebayEngine = new EbayEngine();
     private isProcessing = false;
 
     constructor() {
@@ -108,7 +161,7 @@ class JobManager {
 
     private checkApprovalRequirement(type: JobType): boolean {
         // Critical actions require manual approval as per Protocol 1
-        const HIGH_STAKES: JobType[] = ['post_social', 'deploy_code', 'create_listing'];
+        const HIGH_STAKES: JobType[] = ['post_social', 'deploy_code', 'create_listing', 'ebay_bulk_list'];
         return HIGH_STAKES.includes(type);
     }
 
@@ -201,6 +254,12 @@ class JobManager {
                 return this.socialEngine.fetchMetrics(job.payload.platform);
             case 'sync_inventory':
                 return this.ecomEngine.updateInventory(job.payload.productId, job.payload.qty);
+            case 'ebay_reprice':
+                return this.ebayEngine.executeRepricing();
+            case 'ebay_sync_orders':
+                return this.ebayEngine.syncOrders();
+            case 'ebay_bulk_list':
+                return this.ebayEngine.createBulkListings(job.payload.items);
             default:
                 throw new Error(`Unknown job type: ${job.type}`);
         }
@@ -246,12 +305,11 @@ class Scheduler {
     }
 
     private checkTriggers() {
-        // 1. Check for timed jobs in the queue (JobManager handles this in process(), 
-        // but we trigger process() here just in case it went dormant)
+        // 1. Check for timed jobs in the queue
         this.jobManager.process();
 
-        // 2. (Future) Here we would check recurring cron patterns (e.g., "Every morning at 9am")
-        // For MVP, we assume manual scheduling via chat or agent tools.
+        // 2. Cron: Hourly Order Sync
+        // In a real implementation, check current time against last run time
     }
 }
 
