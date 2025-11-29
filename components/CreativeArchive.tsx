@@ -1,10 +1,11 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ArchivedFile } from '../types';
 
 // --- Icon Components ---
 const XMarkIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 A 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
+    <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
   </svg>
 );
 const UploadIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -48,9 +49,10 @@ interface CreativeArchiveProps {
   onUpload: (files: File[]) => void;
   onDelete: (id: string) => void;
   onRename: (id: string, newName: string) => void;
+  activeWorkspace: string;
 }
 
-const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, files, onUpload, onDelete, onRename }) => {
+const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, files, onUpload, onDelete, onRename, activeWorkspace }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [editingFile, setEditingFile] = useState<{ id: string; name: string } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +78,7 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
         setEditingFile(null);
     };
     
+    // Filter by Search Query (Files are already filtered by activeWorkspace in parent)
     const filteredFiles = files.filter(file => file.name.toLowerCase().includes(searchQuery.toLowerCase()));
     
     if (!isOpen) return null;
@@ -93,7 +96,13 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
         <div className="fixed inset-0 bg-black/70 z-40 flex items-center justify-center p-4 backdrop-blur-sm" onClick={onClose}>
             <div className="bg-gray-900 border border-gray-700/50 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
                 <header className="flex items-center justify-between p-4 border-b border-gray-700/50 flex-shrink-0">
-                    <h2 className="text-xl font-bold text-gray-100">Creative Archive</h2>
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-100">GCS Memory Store</h2>
+                        <div className="flex items-center gap-2 mt-1">
+                             <span className="text-xs text-gray-500 font-mono">bucket: vee-memory</span>
+                             <span className="text-xs text-cyan-400 bg-cyan-900/30 px-2 py-0.5 rounded border border-cyan-800">prefix: {activeWorkspace}/</span>
+                        </div>
+                    </div>
                     <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white transition-colors" aria-label="Close archive">
                         <XMarkIcon className="w-6 h-6" />
                     </button>
@@ -108,7 +117,7 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search archived files..."
+                            placeholder={`Search objects in ${activeWorkspace}...`}
                             className="block w-full rounded-md border-0 bg-gray-800 py-2.5 pl-10 pr-3 text-white ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm"
                         />
                     </div>
@@ -118,10 +127,10 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                     {filteredFiles.length > 0 ? (
                          <ul role="list" className="divide-y divide-gray-700/80">
                             {filteredFiles.map((file) => (
-                                <li key={file.id} className="flex items-center justify-between gap-x-6 py-3 group">
+                                <li key={file.id || file.gcsPath} className="flex items-center justify-between gap-x-6 py-3 group">
                                     <div className="flex min-w-0 gap-x-4 items-center flex-1">
                                         {/* Thumbnail Preview Logic */}
-                                        {file.type.startsWith('image/') && file.content ? (
+                                        {file.metadata.contentType.startsWith('image/') && file.content ? (
                                             <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden border border-gray-600 bg-gray-800 relative">
                                                 <img 
                                                     src={file.content} 
@@ -146,9 +155,15 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                                         ) : (
                                             <div className="min-w-0 flex-auto">
                                                 <p className="text-sm font-semibold leading-6 text-gray-100">{file.name}</p>
-                                                <p className="mt-1 truncate text-xs leading-5 text-gray-400">
-                                                    {formatBytes(file.size)} • {new Date(file.uploadedAt).toLocaleDateString()}
-                                                </p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                     <p className="truncate text-xs leading-5 text-gray-400">
+                                                        {formatBytes(file.size)} • {new Date(file.updated).toLocaleDateString()}
+                                                    </p>
+                                                    <span className="text-[10px] bg-gray-800 text-gray-500 px-1.5 rounded border border-gray-700">
+                                                        {file.metadata.type}
+                                                    </span>
+                                                </div>
+                                               
                                             </div>
                                         )}
                                     </div>
@@ -168,7 +183,7 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                                                     <EditIcon className="h-5 w-5" />
                                                 </button>
                                                 <button 
-                                                    onClick={() => onDelete(file.id)}
+                                                    onClick={() => onDelete(file.gcsPath)}
                                                     className="p-2 rounded-full text-gray-500 hover:text-red-500 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity"
                                                     aria-label={`Delete ${file.name}`}
                                                 >
@@ -182,12 +197,12 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                         </ul>
                     ) : (
                         <div className="text-center py-10">
-                            <p className="text-gray-400">No files found.</p>
+                            <p className="text-gray-400">No objects found in <span className="font-mono text-cyan-500">{activeWorkspace}/</span></p>
                         </div>
                     )}
                 </main>
                 
-                <footer className="p-4 border-t border-gray-700/50 flex-shrink-0">
+                <footer className="p-4 border-t border-gray-700/50 flex-shrink-0 bg-gray-800/30">
                      <input 
                         type="file" 
                         multiple 
@@ -197,9 +212,9 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                     />
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-full flex items-center justify-center px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors"
+                        className="w-full flex items-center justify-center px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors shadow-lg"
                     >
-                       <UploadIcon className="w-5 h-5 mr-2" /> Upload Files
+                       <UploadIcon className="w-5 h-5 mr-2" /> Upload to {activeWorkspace}
                     </button>
                 </footer>
             </div>

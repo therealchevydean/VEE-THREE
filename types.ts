@@ -58,13 +58,27 @@ export interface Task {
   status: TaskStatus;
 }
 
+// --- GCS MEMORY SCHEMA TYPES ---
+
+export type GCSFileType = 'chat_log' | 'upload' | 'zip' | 'extracted_asset' | 'generated_content';
+
+export interface GCSMetadata {
+    projectId: string; // e.g., 'v3_app', 'biofield'
+    type: GCSFileType;
+    description?: string;
+    contentType: string;
+    originalName: string;
+    uploadedBy: 'user' | 'vee_agent';
+}
+
 export interface ArchivedFile {
-  id: string;
+  id: string; // Acts as the Generation ID
+  gcsPath: string; // vee-memory/{projectId}/{type}/{filename}
   name: string;
-  type: string;
   size: number;
-  content: string | null; // Store content for text-based files
-  uploadedAt: string;
+  metadata: GCSMetadata;
+  content: string | null; // Base64 or Text content
+  updated: string; // ISO Date
 }
 
 // --- NEW AGENT ARCHITECTURE TYPES ---
@@ -75,9 +89,9 @@ export type JobType =
   | 'deploy_code' 
   | 'analyze_metrics' 
   | 'sync_inventory'
-  | 'ebay_reprice'    // NEW
-  | 'ebay_sync_orders' // NEW
-  | 'ebay_bulk_list';  // NEW
+  | 'ebay_reprice'
+  | 'ebay_sync_orders'
+  | 'ebay_bulk_list';
 
 export type JobStatus = 'pending' | 'processing' | 'awaiting_approval' | 'completed' | 'failed';
 

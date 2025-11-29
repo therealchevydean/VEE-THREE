@@ -1,64 +1,61 @@
-import { ArchivedFile } from '../types';
+
+import { ArchivedFile, GCSMetadata, GCSFileType } from '../types';
 
 /**
  * =================================================================
- * VEE CREATIVE ARCHIVE SERVICE — SIMULATION
+ * VEE GCS MEMORY SERVICE — SIMULATION
  * =================================================================
  *
- * This service simulates a persistent file storage system, like a cloud
- * bucket (e.g., Google Cloud Storage, AWS S3), for VEE's Creative Archive.
- *
- * --- HOW IT WORKS (IN PRODUCTION) ---
- * 1.  **Uploading:** When a file is uploaded, the frontend would get a secure,
- *     signed URL from the backend. The frontend then uploads the file directly
- *     to the cloud bucket using that URL. Once complete, it notifies the backend,
- *     which saves the file's metadata (name, type, size, storage path) to a
- *     database (e.g., PostgreSQL).
- *
- * 2.  **Indexing & Search:** The backend would index the metadata. For text-based
- *     files, it could also extract the content, create vector embeddings, and
- *     store them in a vector database to enable semantic search on file contents.
- *
- * 3.  **Listing/Retrieving:** The frontend fetches the list of file metadata from
- *     the backend. To view a file, it would request another secure URL to download it.
- *
- * This simulation uses `localStorage` to manage the file metadata and store the
- * content of text-based files directly, providing a functional mock for development.
+ * This service simulates a Google Cloud Storage (GCS) Bucket structure.
+ * 
+ * SCHEMA:
+ * Bucket Name: "vee-memory" (Simulated via localStorage key)
+ * Object Key Pattern: {projectId}/{type}/{filename}
+ * 
+ * Example:
+ * v3_app/uploads/design_mockup.png
+ * biofield/chat_logs/session_2024_05.txt
  */
 
-const ARCHIVE_STORAGE_KEY = 'vee_creative_archive';
+const GCS_BUCKET_KEY = 'vee_gcs_bucket_sim';
 
-// In-memory store, loaded from localStorage to persist across sessions.
-let fileStore: ArchivedFile[] = [];
+// In-memory bucket representation
+let gcsBucket: ArchivedFile[] = [];
 
-const loadArchive = (): void => {
+const loadBucket = (): void => {
     try {
-        const stored = localStorage.getItem(ARCHIVE_STORAGE_KEY);
-        fileStore = stored ? JSON.parse(stored) : [];
+        const stored = localStorage.getItem(GCS_BUCKET_KEY);
+        gcsBucket = stored ? JSON.parse(stored) : [];
     } catch (error) {
-        console.error("Failed to load creative archive from localStorage:", error);
-        fileStore = [];
+        console.error("Failed to load GCS bucket sim from localStorage:", error);
+        gcsBucket = [];
     }
 };
 
-const saveArchive = (): void => {
+const saveBucket = (): void => {
     try {
-        localStorage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify(fileStore));
+        localStorage.setItem(GCS_BUCKET_KEY, JSON.stringify(gcsBucket));
     } catch (error) {
-        console.error("Failed to save creative archive to localStorage:", error);
+        console.error("Failed to save GCS bucket sim to localStorage:", error);
     }
 };
 
-// Initialize archive on module load.
-loadArchive();
+// Initialize bucket
+loadBucket();
 
 /**
- * Reads the content of a file and returns it as a string.
- * Supports text files (text content) and image files (base64 data URL).
+ * Helper: Determines GCS File Type based on MIME type or context
+ */
+const determineFileType = (mimeType: string): GCSFileType => {
+    if (mimeType.includes('zip') || mimeType.includes('compressed')) return 'zip';
+    return 'upload'; // Default for direct user uploads
+};
+
+/**
+ * Reads file content (Base64 or Text)
  */
 const readFileContent = (file: File): Promise<string | null> => {
     return new Promise((resolve) => {
-        // Handle Images for Preview
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = (event) => resolve(event.target?.result as string);
@@ -67,117 +64,141 @@ const readFileContent = (file: File): Promise<string | null> => {
             return;
         }
 
-        // Handle Text-based files
-        const textLikeTypes = ['text/', 'application/json', 'application/javascript', 'application/xml', 'application/x-typescript'];
+        const textLikeTypes = ['text/', 'application/json', 'application/javascript', 'application/xml'];
         if (textLikeTypes.some(type => file.type.startsWith(type)) || file.name.endsWith('.md') || file.name.endsWith('.txt')) {
              const reader = new FileReader();
-            reader.onload = (event) => {
-                resolve(event.target?.result as string);
-            };
-            reader.onerror = () => {
-                resolve(null);
-            };
+            reader.onload = (event) => resolve(event.target?.result as string);
+            reader.onerror = () => resolve(null);
             reader.readAsText(file);
             return;
         }
 
-        // Binary/Unsupported types
         resolve(null);
     });
 };
 
 /**
- * Simulates uploading a file to the archive.
- * @param file The file to upload.
+ * Simulates a GCS PutObject operation.
  */
-export const uploadFile = async (file: File): Promise<void> => {
+export const uploadFile = async (file: File, projectId: string): Promise<void> => {
     const content = await readFileContent(file);
+    const type = determineFileType(file.type);
     
-    const newArchivedFile: ArchivedFile = {
-        id: crypto.randomUUID(),
-        name: file.name,
-        type: file.type,
+    // Construct GCS Key: {projectId}/{type}/{filename}
+    // Sanitize filename
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const gcsPath = `${projectId}/${type}/${safeName}`;
+
+    const metadata: GCSMetadata = {
+        projectId,
+        type,
+        contentType: file.type,
+        originalName: file.name,
+        uploadedBy: 'user',
+        description: 'Uploaded via VEE Web UI'
+    };
+    
+    const newObject: ArchivedFile = {
+        id: crypto.randomUUID(), // Generation ID
+        gcsPath,
+        name: file.name, // Display Name
         size: file.size,
+        metadata,
         content: content,
-        uploadedAt: new Date().toISOString(),
+        updated: new Date().toISOString(),
     };
 
-    fileStore.push(newArchivedFile);
-    saveArchive();
-    console.log(`[Archive Sim]: Uploaded and indexed file "${file.name}".`);
+    // Upsert (Overwrite if path exists, similar to GCS)
+    const existingIndex = gcsBucket.findIndex(f => f.gcsPath === gcsPath);
+    if (existingIndex >= 0) {
+        gcsBucket[existingIndex] = newObject;
+    } else {
+        gcsBucket.push(newObject);
+    }
+
+    saveBucket();
+    console.log(`[GCS Sim]: PutObject gs://vee-memory/${gcsPath}`);
 };
 
 /**
- * Lists all files currently in the archive.
- * @returns An array of ArchivedFile objects.
+ * Simulates GCS ListObjects (Prefix Scan).
+ * Only returns objects belonging to the specific projectId.
  */
-export const listFiles = (): ArchivedFile[] => {
-    // Return a sorted list, newest first
-    return [...fileStore].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
+export const listFiles = (projectId: string): ArchivedFile[] => {
+    // Prefix scan: items starting with "projectId/"
+    const prefix = `${projectId}/`;
+    return gcsBucket
+        .filter(file => file.gcsPath.startsWith(prefix))
+        .sort((a, b) => new Date(b.updated).getTime() - new Date(a.updated).getTime());
 };
 
 /**
- * Deletes a file from the archive.
- * @param id The ID of the file to delete.
+ * Deletes an object.
  */
-export const deleteFile = (id: string): void => {
-    const initialLength = fileStore.length;
-    fileStore = fileStore.filter(file => file.id !== id);
-    if (fileStore.length < initialLength) {
-        saveArchive();
-        console.log(`[Archive Sim]: Deleted file with ID "${id}".`);
+export const deleteFile = (gcsPath: string): void => {
+    const initialLength = gcsBucket.length;
+    gcsBucket = gcsBucket.filter(file => file.gcsPath !== gcsPath);
+    if (gcsBucket.length < initialLength) {
+        saveBucket();
+        console.log(`[GCS Sim]: DeleteObject gs://vee-memory/${gcsPath}`);
     }
 };
 
 /**
- * Renames a file in the archive.
- * @param id The ID of the file to rename.
- * @param newName The new name for the file.
- * @returns True if successful, false otherwise.
+ * Renames a file (Simulates Copy + Delete).
  */
-export const renameFile = (id: string, newName: string): boolean => {
-    const fileIndex = fileStore.findIndex(file => file.id === id);
+export const renameFile = (oldPath: string, newName: string): boolean => {
+    const fileIndex = gcsBucket.findIndex(file => file.gcsPath === oldPath);
     if (fileIndex > -1) {
-        fileStore[fileIndex].name = newName;
-        saveArchive();
-        console.log(`[Archive Sim]: Renamed file with ID "${id}" to "${newName}".`);
+        const file = gcsBucket[fileIndex];
+        // Reconstruct path with new filename
+        const pathParts = file.gcsPath.split('/');
+        pathParts[pathParts.length - 1] = newName.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const newPath = pathParts.join('/');
+
+        gcsBucket[fileIndex] = {
+            ...file,
+            gcsPath: newPath,
+            name: newName
+        };
+        saveBucket();
         return true;
     }
-    console.warn(`[Archive Sim]: Could not find file with ID "${id}" to rename.`);
     return false;
 };
 
 /**
- * Searches the archive for files matching a query.
- * This simulates metadata and (for text files) content search.
- * @param query The search query.
- * @returns A promise that resolves to an object containing the results.
+ * Searches across the entire bucket (or scoped to project).
  */
-export const searchFiles = async (query: string): Promise<{ status: string; results: Partial<ArchivedFile>[] }> => {
-    // Force a reload from localStorage to ensure the in-memory cache is not stale.
-    loadArchive();
-
-    console.log(`[Archive Sim]: Searching archive for "${query}"`);
+export const searchFiles = async (query: string, projectId?: string): Promise<{ status: string; results: Partial<ArchivedFile>[] }> => {
+    loadBucket();
+    console.log(`[GCS Sim]: Search query "${query}" scoped to: ${projectId || 'GLOBAL'}`);
     const lowerCaseQuery = (query || '').toLowerCase();
 
-    const results = fileStore
-        .filter(file => 
-            !lowerCaseQuery || // If query is empty/null, match everything
-            file.name.toLowerCase().includes(lowerCaseQuery) ||
-            (file.type.startsWith('text') && file.content && file.content.toLowerCase().includes(lowerCaseQuery))
-        )
+    const results = gcsBucket
+        .filter(file => {
+            // Scope check
+            if (projectId && file.metadata.projectId !== projectId) return false;
+            
+            // Content check
+            return (
+                file.name.toLowerCase().includes(lowerCaseQuery) ||
+                (file.content && typeof file.content === 'string' && file.content.toLowerCase().includes(lowerCaseQuery))
+            );
+        })
         .map(file => ({
             id: file.id,
+            gcsPath: file.gcsPath,
             name: file.name,
-            type: file.type,
             size: file.size,
-            uploadedAt: file.uploadedAt,
-            // Include a snippet of content if it's a text file and matches
-            contentSnippet: (file.type.startsWith('text') && file.content) ? file.content.substring(0, 150) + '...' : null
+            updated: file.updated,
+            metadata: file.metadata,
+            contentSnippet: (file.content && file.metadata.type !== 'zip' && !file.metadata.contentType.startsWith('image/')) 
+                ? file.content.substring(0, 150) + '...' 
+                : null
         }));
         
-    // Sort results by upload date, newest first
-    results.sort((a, b) => new Date(b.uploadedAt!).getTime() - new Date(a.uploadedAt!).getTime());
+    results.sort((a, b) => new Date(b.updated!).getTime() - new Date(a.updated!).getTime());
 
     return {
         status: 'success',

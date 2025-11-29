@@ -27,6 +27,7 @@ interface ChatInterfaceProps {
     connections: Record<string, Connection | null>;
     onRenameArchiveFile: (id: string, newName: string) => boolean;
     onUploadToArchive: (files: File[]) => void;
+    activeWorkspace: string;
 }
 
 const extractTextFromDocx = async (file: File): Promise<string> => {
@@ -49,7 +50,7 @@ const extractTextFromDocx = async (file: File): Promise<string> => {
 };
 
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask, tasks, onUpdateTaskStatus, onDeleteTask, isScreenSharing, onSetIsScreenSharing, connections, onRenameArchiveFile, onUploadToArchive }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask, tasks, onUpdateTaskStatus, onDeleteTask, isScreenSharing, onSetIsScreenSharing, connections, onRenameArchiveFile, onUploadToArchive, activeWorkspace }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isVeoKeySelected, setIsVeoKeySelected] = useState(false);
@@ -391,7 +392,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
         case 'recallFromMemory':
             return await recall(args.query as string);
         case 'searchArchive':
-            return await creativeArchiveService.searchFiles(args.query as string);
+            // Use activeWorkspace as project scope if not specified by AI
+            return await creativeArchiveService.searchFiles(args.query as string, activeWorkspace);
         case 'renameArchivedFile': {
             const success = onRenameArchiveFile(args.fileId, args.newName);
             if (success) {

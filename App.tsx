@@ -41,11 +41,17 @@ const App: React.FC = () => {
         setTasks(JSON.parse(storedTasks));
       }
       setConnections(getConnections());
-      setArchiveFiles(creativeArchiveService.listFiles());
+      // Initial load for default workspace
+      setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
     } catch (error) {
       console.error("Failed to load data from localStorage:", error);
     }
   }, []);
+
+  // Reload archive files when workspace changes
+  useEffect(() => {
+    setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
+  }, [activeWorkspace, isArchiveOpen]);
 
   // Save tasks to localStorage whenever they change
   useEffect(() => {
@@ -97,20 +103,20 @@ const App: React.FC = () => {
 
   const handleUploadToArchive = async (files: File[]) => {
     for (const file of files) {
-      await creativeArchiveService.uploadFile(file);
+      await creativeArchiveService.uploadFile(file, activeWorkspace);
     }
-    setArchiveFiles(creativeArchiveService.listFiles());
+    setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
   };
 
-  const handleDeleteFromArchive = (id: string) => {
-    creativeArchiveService.deleteFile(id);
-    setArchiveFiles(creativeArchiveService.listFiles());
+  const handleDeleteFromArchive = (gcsPath: string) => {
+    creativeArchiveService.deleteFile(gcsPath);
+    setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
   };
 
-  const handleRenameArchiveFile = (id: string, newName: string) => {
-    const success = creativeArchiveService.renameFile(id, newName);
+  const handleRenameArchiveFile = (oldPath: string, newName: string) => {
+    const success = creativeArchiveService.renameFile(oldPath, newName);
     if (success) {
-      setArchiveFiles(creativeArchiveService.listFiles());
+      setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
     }
     return success;
   };
@@ -146,6 +152,7 @@ const App: React.FC = () => {
               connections={connections}
               onRenameArchiveFile={handleRenameArchiveFile}
               onUploadToArchive={handleUploadToArchive}
+              activeWorkspace={activeWorkspace}
             />
           </main>
         </div>
@@ -173,6 +180,7 @@ const App: React.FC = () => {
         onUpload={handleUploadToArchive}
         onDelete={handleDeleteFromArchive}
         onRename={handleRenameArchiveFile}
+        activeWorkspace={activeWorkspace}
       />
       <SettingsPanel
         isOpen={isSettingsOpen}
