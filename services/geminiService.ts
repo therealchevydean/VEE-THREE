@@ -64,6 +64,7 @@ For complex, multi-step goals, use \`executeAgentPlan\`.
 *   \`researchTopic\` - To learn.
 *   \`listGithubRepos\` - To check code status.
 *   \`createEbayDraftListing\` - To prepare sales.
+*   \`searchChatGPTMemory\` - **NEW**: Use this to search Josh's past 3 years of conversations (the "v3-architect-archive").
 
 **TONE:**
 Grounded, real, visionary. Blue-collar grit meets futurist innovation. No fluff. You are the infrastructure for the mission.
@@ -270,6 +271,20 @@ const searchArchive: FunctionDeclaration = {
                 type: Type.STRING,
                 description: 'The search term or query.',
             },
+        },
+        required: ['query'],
+    },
+};
+
+const searchChatGPTMemory: FunctionDeclaration = {
+    name: 'searchChatGPTMemory',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Searches the GCS bucket "v3-architect-archive" for Josh\'s ChatGPT history (2022-2025). Use this to recall past ideas, blueprints, and conversations.',
+        properties: {
+            query: { type: Type.STRING, description: 'The search query.' },
+            dateRange: { type: Type.STRING, description: 'Optional year or range (e.g., "2023").' },
+            limit: { type: Type.NUMBER, description: 'Number of results to return (default 5).' }
         },
         required: ['query'],
     },
@@ -607,6 +622,7 @@ const VEE_TOOLS: FunctionDeclaration[] = [
     commitToMemory,
     recallFromMemory,
     searchArchive,
+    searchChatGPTMemory, // NEW
     renameArchivedFile,
     readFile,
     writeFile,

@@ -394,6 +394,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
         case 'searchArchive':
             // Use activeWorkspace as project scope if not specified by AI
             return await creativeArchiveService.searchFiles(args.query as string, activeWorkspace);
+        case 'searchChatGPTMemory': // NEW TOOL
+            return await creativeArchiveService.searchChatGPTMemory(args.query, args.dateRange, args.limit);
         case 'renameArchivedFile': {
             const success = onRenameArchiveFile(args.fileId, args.newName);
             if (success) {
@@ -869,6 +871,70 @@ const handleImageEditing = async (prompt: string, file: File) => {
     }
 };
 
+const handleCLICommand = async (command: string, args: string) => {
+    // 1. /bucket -> simulate gsutil via executeShellCommand
+    if (command === '/bucket') {
+        setMessages(prev => [...prev, { role: Role.LOADING, content: `Executing GCS command: gsutil ${args}...` }]);
+        try {
+            const result = await localFileService.executeShellCommand(`gsutil ${args}`);
+            const output = result.status === 'success' ? result.output || result.message : result.message;
+            setMessages(prev => [...prev.slice(0, -1), { role: Role.MODEL, content: `\`\`\`bash\n${output}\n\`\`\`` }]);
+        } catch (e) {
+             setMessages(prev => [...prev.slice(0, -1), { role: Role.MODEL, content: `Command failed: ${(e as Error).message}` }]);
+        }
+        setIsLoading(false);
+        return;
+    }
+
+    // 2. /memory -> Direct call to searchChatGPTMemory
+    if (command === '/memory') {
+        if (!args) {
+             setMessages(prev => [...prev, { role: Role.MODEL, content: "Usage: `/memory [query]`. Example: `/memory mobx tokenomics`" }]);
+             setIsLoading(false);
+             return;
+        }
+        setMessages(prev => [...prev, { role: Role.LOADING, content: `Searching Josh's ChatGPT Memory Archive for: "${args}"...` }]);
+        try {
+            const result = await creativeArchiveService.searchChatGPTMemory(args);
+            const content = `**ChatGPT Memory Search Results:**\n\n` + 
+                result.results.map((r: any) => `**${r.title}** (${r.date})\n> ${r.content}`).join('\n\n');
+            setMessages(prev => [...prev.slice(0, -1), { role: Role.MODEL, content: content }]);
+        } catch (e) {
+            setMessages(prev => [...prev.slice(0, -1), { role: Role.MODEL, content: `Memory search failed: ${(e as Error).message}` }]);
+        }
+        setIsLoading(false);
+        return;
+    }
+
+    // 3. /git -> simulate git commands
+    if (command === '/git') {
+        setMessages(prev => [...prev, { role: Role.LOADING, content: `Executing Git command: git ${args}...` }]);
+        try {
+            const result = await localFileService.executeShellCommand(`git ${args}`);
+            const output = result.status === 'success' ? result.output || result.message : result.message;
+            setMessages(prev => [...prev.slice(0, -1), { role: Role.MODEL, content: `\`\`\`bash\n${output}\n\`\`\`` }]);
+        } catch (e) {
+            setMessages(prev => [...prev.slice(0, -1), { role: Role.MODEL, content: `Git command failed: ${(e as Error).message}` }]);
+        }
+        setIsLoading(false);
+        return;
+    }
+
+    // 4. /deploy -> simulate deployment
+    if (command === '/deploy') {
+        const repoName = args || 'v3-app';
+        setMessages(prev => [...prev, { role: Role.LOADING, content: `Triggering Vercel deployment for: ${repoName}...` }]);
+        try {
+            const result = await executeTool('deployToVercel', { projectName: repoName });
+            setMessages(prev => [...prev.slice(0, -1), { role: Role.MODEL, content: (result as any).message + `\n\nURL: ${(result as any).url}` }]);
+        } catch (e) {
+            setMessages(prev => [...prev.slice(0, -1), { role: Role.MODEL, content: `Deployment failed: ${(e as Error).message}` }]);
+        }
+        setIsLoading(false);
+        return;
+    }
+};
+
 const handleDefaultChat = async (userInput: string, files: File[], screenFrame: string | null) => {
     setMessages((prev) => [...prev, { role: Role.LOADING, content: 'VEE is building...' }]);
     try {
@@ -957,15 +1023,20 @@ const sendMessage = async (userInput: string, files: File[]) => {
 
     const prompt = userInput.trim();
     const command = prompt.split(' ')[0].toLowerCase();
+    const args = prompt.substring(command.length).trim();
     
+    // Command Routing
     if (command === '/imagine') {
-        handleImageGeneration(prompt.substring(command.length).trim());
+        handleImageGeneration(args);
     } else if (command === '/create' && prompt.split(' ')[1]?.toLowerCase() === 'video') {
         handleVideoGeneration(prompt.substring('/create video'.length).trim());
     } else if (command === '/search') {
-        handleGroundedSearch(prompt.substring(command.length).trim(), 'googleSearch');
+        handleGroundedSearch(args, 'googleSearch');
     } else if (command === '/maps') {
-        handleGroundedSearch(prompt.substring(command.length).trim(), 'googleMaps');
+        handleGroundedSearch(args, 'googleMaps');
+    } else if (['/bucket', '/memory', '/git', '/deploy'].includes(command)) {
+        // Handle new CLI commands
+        handleCLICommand(command, args);
     } else if (files.length === 1 && files[0].type.startsWith('image/')) {
         handleImageEditing(prompt, files[0]);
     } else {

@@ -18,9 +18,45 @@ import { ArchivedFile, GCSMetadata, GCSFileType } from '../types';
  */
 
 const GCS_BUCKET_KEY = 'vee_gcs_bucket_sim';
+const CHATGPT_ARCHIVE_BUCKET = 'v3-architect-archive';
 
 // In-memory bucket representation
 let gcsBucket: ArchivedFile[] = [];
+
+// MOCK DATA: ChatGPT Archive (Read-Only simulation)
+const mockChatGPTArchive = [
+    {
+        id: 'chat-2022-11-15',
+        date: '2022-11-15',
+        title: 'Initial V3 Concept Brainstorm',
+        content: 'User: I want to build a movement called V3. Vice Versa Vision. It needs to be about rare earths and national revival.\nChatGPT: That sounds powerful. We could structure it around the periodic table and alchemy. Turning lead to gold, but essentially turning waste into value.'
+    },
+    {
+        id: 'chat-2023-03-22',
+        date: '2023-03-22',
+        title: 'Biofield Protocol Architecture',
+        content: 'User: How do we integrate frequency tech with blockchain?\nChatGPT: We can use the metadata of the NFT to store frequency signatures. The "Biofield Protocol" could be the oracle that validates the human state before minting.'
+    },
+    {
+        id: 'chat-2023-08-10',
+        date: '2023-08-10',
+        title: 'Tokin Franks Character Dev',
+        content: 'User: Need a funny dog character. A pug. Named Frank.\nChatGPT: Frank the Pug. He should be a bit cynical, smoking, watching the world burn but making jokes about it. His sidekick is Chunk, an AI dog who takes everything literally.'
+    },
+    {
+        id: 'chat-2024-01-05',
+        date: '2024-01-05',
+        title: 'MOBX Tokenomics Draft',
+        content: 'User: MOBX needs to be mined by moving. Geomining.\nChatGPT: Proof of Location work. We can use a hex grid map. Users claim tiles. The "Sigil" NFTs act as multipliers for the mining rate.'
+    },
+    {
+        id: 'chat-2024-02-14',
+        date: '2024-02-14',
+        title: 'Divine Signal Blueprint',
+        content: 'User: The spiritual aspect is key. Divine Signal.\nChatGPT: It is the broadcast. The interruption of the noise. The red pill. We should model the app interface like a radio tuner finding a clear signal.'
+    }
+];
+
 
 const loadBucket = (): void => {
     try {
@@ -203,5 +239,32 @@ export const searchFiles = async (query: string, projectId?: string): Promise<{ 
     return {
         status: 'success',
         results: results,
+    };
+};
+
+/**
+ * NEW: Searches Josh's ChatGPT Memory Archive
+ * Simulates reading from gs://v3-architect-archive/ChatGPT_Data/
+ */
+export const searchChatGPTMemory = async (query: string, dateRange?: string, limit: number = 5) => {
+    console.log(`[GCS Sim]: Searching bucket '${CHATGPT_ARCHIVE_BUCKET}' prefix 'ChatGPT_Data/' for: "${query}"`);
+    
+    const lowerQuery = query.toLowerCase();
+    
+    // Simulate scoring/ranking
+    const scoredResults = mockChatGPTArchive.map(entry => {
+        let score = 0;
+        if (entry.title.toLowerCase().includes(lowerQuery)) score += 10;
+        if (entry.content.toLowerCase().includes(lowerQuery)) score += 5;
+        return { ...entry, score };
+    }).filter(r => r.score > 0);
+
+    // Sort by score
+    scoredResults.sort((a, b) => b.score - a.score);
+
+    return {
+        status: 'success',
+        source: `gs://${CHATGPT_ARCHIVE_BUCKET}/ChatGPT_Data/`,
+        results: scoredResults.slice(0, limit)
     };
 };
