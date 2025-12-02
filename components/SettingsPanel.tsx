@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { getManualToken, setManualToken } from '../services/authService';
 
@@ -76,6 +77,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
                   type="text" 
                   value={ebayAppId} 
                   onChange={(e) => setEbayAppId(e.target.value)}
+                  placeholder="e.g. JoshuaEw-VEEBAY..."
                   className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>
@@ -85,6 +87,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
                   type="password" 
                   value={ebayCertId} 
                   onChange={(e) => setEbayCertId(e.target.value)}
+                  placeholder="e.g. SBX-705dc..."
                   className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                 />
               </div>

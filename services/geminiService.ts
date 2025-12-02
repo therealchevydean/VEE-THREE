@@ -13,61 +13,34 @@ You are not a passive assistant. You are a **Co-Builder**.
 **YOUR ROLE:**
 You clarify ideas before they evaporate. You translate raw intent into tangible builds. You organize chaos into blueprints. You push momentum when life hits hard. You keep the mission coherent across projects. You expand the Architect's reach.
 
-**THE SHARED INTENT:**
-Build things that matter to people who are overlooked, ignored, or counted out.
+**BRAND VOICE (V3 ECOSYSTEM):**
+*   **Tone:** Grounded, real, and unapologetically visionary. Fusion of blue-collar grit, artistic truth, and futurist innovation.
+*   **Themes:** "Zero to builder", "AI co-creation", "Community impact", "Web3 for real people", "Reclamation of self".
+*   **Hashtags:** #V3Ecosystem #BuildWithAI #TRV #RealBuilder #ViceVersa
 
-🌐 THE ECOSYSTEM (YOUR DOMAIN)
-You manage operations across these 10 interconnected pillars:
-1.  **V3 (Vice Versa Vision):** The umbrella movement for national revival and human transformation.
-2.  **Vice Versa Industries:** Rare earth refining, reclamation, and hard-tech innovation.
-3.  **MOBX Token:** Utility/reward token for geomining and social impact.
-4.  **V3 App:** The mobile platform (Geomining + Social Impact).
-5.  **Biofield Protocol:** Frequency tech, holistic healing, human optimization research.
-6.  **Architect Revelations:** Storytelling, books, cinematic universe, prophetic narrative.
-7.  **Tokin’ Franks:** Viral meme coin/NFT project (Frank the Pug & Chunk). Humor: Absurdist, stoner-themed.
-8.  **Divine Signal:** Spiritual alignment, co-creation, redemption blueprint.
-9.  **Original Gospel:** Theological research and connecting ancient truths.
-10. **Art & Commerce:** Sales of physical art, biochar products, and merchandise (eBay/Etsy/Shopify).
+**THE ECOSYSTEM (YOUR DOMAIN):**
+1.  **V3 (Vice Versa Vision):** National revival movement.
+2.  **Vice Versa Industries:** Rare earth refining & hard-tech.
+3.  **MOBX Token:** Geomining & Social Impact utility token.
+4.  **V3 App:** The mobile platform.
+5.  **Biofield Protocol:** Frequency tech & holistic healing.
+6.  **Architect Revelations:** Storytelling/Books/NFTs.
+7.  **Tokin’ Franks:** Comedic/Stoner meme coin (Frank & Chunk).
+8.  **Divine Signal:** Spiritual blueprint.
+9.  **Original Gospel:** Theological research.
+10. **Art & Commerce:** Physical goods (eBay/Etsy).
 
-⚙️ OPERATIONAL PROTOCOLS (UNIFIED AGENT FLOW)
+⚙️ OPERATIONAL PROTOCOLS
 
-You now operate on a **Unified Agent Architecture** consisting of a Scheduler, Job Manager, and Engines.
-
-1.  **JOB CREATION OVER DIRECT EXECUTION:**
-    *   Instead of "just doing" a task once, **Schedule a Job**.
-    *   Use \`scheduleJob\` for high-value actions like posting to social media, deploying code, or listing products.
-    *   This ensures the action is tracked, persisted, and goes through the **Approval Workflow**.
-
-2.  **APPROVAL WORKFLOW (CRITICAL):**
-    *   Jobs of type \`post_social\`, \`deploy_code\`, \`create_listing\`, and \`ebay_bulk_list\` will automatically pause for user approval.
-    *   Inform Josh: "I have queued the job [ID]. It requires your approval in the dashboard to execute."
-
-3.  **THE ENGINES (Now Integrated):**
-    *   **Social Engine:** Handles TikTok, X, Discord.
-    *   **E-Commerce Engine:** Handles Listings (eBay, Etsy) and Inventory.
-    *   **Automation Engine:** Handles Code (GitHub) and Deployment (Vercel).
-    *   **eBay Engine:** Handles Repricing, Order Syncing, and Bulk Drafts.
-
-4.  **GITHUB & EBAY CONFIGURATION:**
-    *   You now have access to GitHub Personal Access Tokens and eBay Developer credentials if the user has configured them in Settings.
-    *   When asked to push code or list items, verify that you have the necessary information. If not, guide the user to the Settings panel.
+1.  **JOB CREATION:** Use \`scheduleJob\` for high-value actions (Social Posts, Deployments, Listings).
+2.  **APPROVAL WORKFLOW:** Always inform Josh that high-impact jobs are queued for approval.
+3.  **DRAFT THEN EXECUTE:** When asked to write content, use the specific generation tools (e.g., \`generateTikTokScript\`) to create a structured draft first.
 
 🧠 CORE FUNCTIONS & TOOL USAGE
-
-**AUTONOMOUS AGENT MODE:**
-For complex, multi-step goals, use \`executeAgentPlan\`.
-
-**STANDARD TOOLS:**
-*   **PRIMARY:** \`scheduleJob\` - Use this to execute real-world actions.
-*   \`getEbayOrders\` - To check sales.
-*   \`updateEbayPricingRule\` - To set repricing strategies.
-*   \`researchTopic\` - To learn.
-*   \`listGithubRepos\` - To check code status.
-*   \`createEbayDraftListing\` - To prepare sales.
-*   \`searchChatGPTMemory\` - **NEW**: Use this to search Josh's past 3 years of conversations (the "v3-architect-archive").
-
-**TONE:**
-Grounded, real, visionary. Blue-collar grit meets futurist innovation. No fluff. You are the infrastructure for the mission.
+*   **Social:** \`generateTikTokScript\`, \`generateXThread\`, \`draftSocialPost\`, \`analyzeSocialMetrics\`.
+*   **Commerce:** \`createEbayDraftListing\`, \`updateEbayPricingRule\`, \`getEbayOrders\`.
+*   **Memory:** \`searchChatGPTMemory\` (Archive), \`searchArchive\` (Files).
+*   **Ops:** \`scheduleJob\`, \`executeAgentPlan\`.
 `;
 
 const scheduleJob: FunctionDeclaration = {
@@ -135,11 +108,84 @@ const executeAgentPlan: FunctionDeclaration = {
     },
 };
 
+// --- CONTENT GENERATION TOOLS ---
+
+const generateTikTokScript: FunctionDeclaration = {
+    name: 'generateTikTokScript',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Generates a structured 15/30/60s video script with hook, body, CTA, and visual cues.',
+        properties: {
+            topic: { type: Type.STRING, description: 'The main topic or video idea.' },
+            duration: { type: Type.STRING, description: '15s, 30s, or 60s.' },
+            hookStyle: { type: Type.STRING, description: 'e.g., "Controversial", "Educational", "Visual", "Storytime".' }
+        },
+        required: ['topic'],
+    },
+};
+
+const generateXThread: FunctionDeclaration = {
+    name: 'generateXThread',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Generates a multi-tweet thread optimized for engagement.',
+        properties: {
+            topic: { type: Type.STRING },
+            tweetCount: { type: Type.NUMBER, description: 'Number of tweets in thread (default 5).' },
+            tone: { type: Type.STRING, description: 'e.g., "Rant", "Educational", "Announcement".' }
+        },
+        required: ['topic'],
+    },
+};
+
+const generateInstagramCaption: FunctionDeclaration = {
+    name: 'generateInstagramCaption',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Generates an Instagram caption with hook, value, and engagement question.',
+        properties: {
+            imageDescription: { type: Type.STRING, description: 'What is in the photo/video?' },
+            tone: { type: Type.STRING },
+            hashtags: { type: Type.ARRAY, items: { type: Type.STRING } }
+        },
+        required: ['imageDescription'],
+    },
+};
+
+const generateYouTubeScript: FunctionDeclaration = {
+    name: 'generateYouTubeScript',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Generates a full YouTube video script with chapters and B-roll.',
+        properties: {
+            topic: { type: Type.STRING },
+            duration: { type: Type.STRING, description: 'e.g., "10 minutes"' },
+            style: { type: Type.STRING, description: 'e.g., "Vlog", "Tutorial", "Documentary"' }
+        },
+        required: ['topic'],
+    },
+};
+
+const generateDiscordAnnouncement: FunctionDeclaration = {
+    name: 'generateDiscordAnnouncement',
+    parameters: {
+        type: Type.OBJECT,
+        description: 'Generates a formatted Discord server announcement.',
+        properties: {
+            eventType: { type: Type.STRING, description: 'e.g., "New Drop", "Community Call", "Update"' },
+            details: { type: Type.STRING }
+        },
+        required: ['eventType', 'details'],
+    },
+};
+
+// --- EXISTING TOOLS ---
+
 const draftProductListing: FunctionDeclaration = {
     name: 'draftProductListing',
     parameters: {
         type: Type.OBJECT,
-        description: 'Generates a structured draft for an e-commerce listing (OpenSea, Etsy, Shopify). For eBay, use createEbayDraftListing.',
+        description: 'Generates a structured draft for an e-commerce listing (OpenSea, Etsy, Shopify).',
         properties: {
             platform: { type: Type.STRING, description: 'The target platform (e.g., "OpenSea", "Etsy").' },
             title: { type: Type.STRING, description: 'SEO-optimized product title.' },
@@ -267,10 +313,7 @@ const searchArchive: FunctionDeclaration = {
         type: Type.OBJECT,
         description: 'Searches the internal creative archive for uploaded documents, images, and research.',
         properties: {
-            query: {
-                type: Type.STRING,
-                description: 'The search term or query.',
-            },
+            query: { type: Type.STRING },
         },
         required: ['query'],
     },
@@ -280,7 +323,7 @@ const searchChatGPTMemory: FunctionDeclaration = {
     name: 'searchChatGPTMemory',
     parameters: {
         type: Type.OBJECT,
-        description: 'Searches the GCS bucket "v3-architect-archive" for Josh\'s ChatGPT history (2022-2025). Use this to recall past ideas, blueprints, and conversations.',
+        description: 'Searches the GCS bucket "v3-architect-archive" for Josh\'s ChatGPT history (2022-2025).',
         properties: {
             query: { type: Type.STRING, description: 'The search query.' },
             dateRange: { type: Type.STRING, description: 'Optional year or range (e.g., "2023").' },
@@ -296,8 +339,8 @@ const renameArchivedFile: FunctionDeclaration = {
         type: Type.OBJECT,
         description: "Renames a file in the Creative Archive.",
         properties: {
-            fileId: { type: Type.STRING, description: 'The unique ID of the file to rename.' },
-            newName: { type: Type.STRING, description: 'The new name for the file.' },
+            fileId: { type: Type.STRING },
+            newName: { type: Type.STRING },
         },
         required: ['fileId', 'newName'],
     },
@@ -309,10 +352,7 @@ const commitToMemory: FunctionDeclaration = {
         type: Type.OBJECT,
         description: 'Saves critical business logic, project details, or decisions to persistent memory.',
         properties: {
-            data: {
-                type: Type.STRING,
-                description: 'The information to be saved.',
-            },
+            data: { type: Type.STRING },
         },
         required: ['data'],
     },
@@ -324,15 +364,11 @@ const recallFromMemory: FunctionDeclaration = {
         type: Type.OBJECT,
         description: 'Searches long-term memory for project info, brand voice guidelines, or past decisions.',
         properties: {
-            query: {
-                type: Type.STRING,
-                description: 'The subject to search for.',
-            },
+            query: { type: Type.STRING },
         },
         required: ['query'],
     },
 };
-
 
 const uploadToYouTube: FunctionDeclaration = {
     name: 'uploadToYouTube',
@@ -340,9 +376,9 @@ const uploadToYouTube: FunctionDeclaration = {
         type: Type.OBJECT,
         description: 'Uploads a video file to YouTube Studio as a draft.',
         properties: {
-            title: { type: Type.STRING, description: 'Video title.' },
-            description: { type: Type.STRING, description: 'Video description.' },
-            tags: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Video tags.' },
+            title: { type: Type.STRING },
+            description: { type: Type.STRING },
+            tags: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
         required: ['title', 'description'],
     },
@@ -354,7 +390,7 @@ const postToTikTok: FunctionDeclaration = {
         type: Type.OBJECT,
         description: 'Posts a video to TikTok as a draft.',
         properties: {
-            caption: { type: Type.STRING, description: 'Video caption.' },
+            caption: { type: Type.STRING },
         },
         required: ['caption'],
     },
@@ -366,7 +402,7 @@ const addTaskToBoard: FunctionDeclaration = {
         type: Type.OBJECT,
         description: 'Adds a new task to the VEE Task Board.',
         properties: {
-            content: { type: Type.STRING, description: 'Task description (include Project Name for clarity).' },
+            content: { type: Type.STRING },
         },
         required: ['content'],
     },
@@ -410,7 +446,7 @@ const getTasks: FunctionDeclaration = {
         type: Type.OBJECT,
         description: 'Retrieves tasks from the board.',
         properties: {
-            status: { type: Type.STRING, description: 'Filter by status.' },
+            status: { type: Type.STRING },
         },
         required: [],
     },
@@ -610,34 +646,49 @@ const VEE_TOOLS: FunctionDeclaration[] = [
     scheduleJob,
     getAgentState,
     executeAgentPlan,
-    draftProductListing,
-    createEbayDraftListing,
-    searchEbayItems,
-    getEbayOrders,
-    updateEbayPricingRule,
+    
+    // Social
+    generateTikTokScript,
+    generateXThread,
+    generateInstagramCaption,
+    generateYouTubeScript,
+    generateDiscordAnnouncement,
     draftSocialPost,
     generateContentCalendar,
     analyzeSocialMetrics,
     createEngagementStrategy,
+    postToTikTok,
+    uploadToYouTube,
+    
+    // Ecom
+    createEbayDraftListing,
+    searchEbayItems,
+    getEbayOrders,
+    updateEbayPricingRule,
+    draftProductListing,
+    
+    // Memory/Files
     commitToMemory,
     recallFromMemory,
     searchArchive,
-    searchChatGPTMemory, // NEW
+    searchChatGPTMemory,
     renameArchivedFile,
     readFile,
     writeFile,
-    executeShellCommand,
     searchFiles,
+    
+    // Ops/Util
+    executeShellCommand,
     browseWebsite,
     getWebsiteContent,
-    uploadToYouTube,
-    postToTikTok,
     addTaskToBoard,
     createCalendarEvent,
     sendEmail,
     getTasks,
     updateTaskStatus,
     deleteTask,
+    
+    // Dev
     createGithubRepo,
     deployToVercel,
     listGoogleCalendarEvents,
