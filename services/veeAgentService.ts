@@ -2,6 +2,7 @@
 import { Job, JobType, JobStatus, AgentStateSnapshot } from '../types';
 import { commit } from './memoryService';
 import { ebayService } from './ebayService';
+import { socialMediaService } from './socialMediaService';
 
 /**
  * =================================================================
@@ -18,15 +19,15 @@ import { ebayService } from './ebayService';
 
 class SocialMediaEngine {
     async publishPost(platform: string, content: string): Promise<string> {
-        console.log(`[SocialEngine] Publishing to ${platform}: ${content.substring(0, 30)}...`);
-        // Simulate API latency
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return `Success: Posted to ${platform} at ${new Date().toISOString()}`;
+        console.log(`[SocialEngine] Publishing to ${platform}...`);
+        // Use the new service
+        return await socialMediaService.publishPost(platform, content);
     }
 
     async fetchMetrics(platform: string): Promise<any> {
         console.log(`[SocialEngine] Fetching metrics for ${platform}`);
-        return { views: Math.floor(Math.random() * 10000), likes: Math.floor(Math.random() * 500) };
+        // Use the new service
+        return await socialMediaService.getAnalytics(platform, 'last_7_days');
     }
 }
 

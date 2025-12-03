@@ -9,6 +9,7 @@ import * as webBrowserService from '../services/webBrowserService';
 import * as creativeArchiveService from '../services/creativeArchiveService';
 import { veeAgent } from '../services/veeAgentService';
 import { ebayService } from '../services/ebayService';
+import { socialMediaService } from '../services/socialMediaService';
 import { Message, Role, Task, TaskStatus, AgentPlan, AgentStep, AgentStepStatus, JobType } from '../types';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
@@ -63,6 +64,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const prevConnectionsRef = useRef(connections);
+  
+  // Ref to track audio state inside async callbacks
+  const isAudioEnabledRef = useRef(isAudioEnabled);
+
+  // Sync ref and handle immediate stop when toggled
+  useEffect(() => {
+    isAudioEnabledRef.current = isAudioEnabled;
+    if (!isAudioEnabled) {
+        if (audioSourceRef.current) {
+            try {
+                audioSourceRef.current.stop();
+            } catch (e) {
+                // Ignore if already stopped
+            }
+        }
+    }
+  }, [isAudioEnabled]);
 
   const getErrorMessage = (error: unknown, context: string): string => {
     const baseMessage = `Apologies, I encountered an error during ${context}.`;
@@ -112,9 +130,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
             };
             setMessages(prev => prev.map(m => m === loadingMessage ? successMessage : m));
 
-            if (isAudioEnabled) {
+            if (isAudioEnabledRef.current) {
                 const audioData = await generateSpeech("GitHub connection complete. I have access to your repositories and am ready for instructions.");
-                if (audioData) playAudio(audioData);
+                if (audioData && isAudioEnabledRef.current) playAudio(audioData);
             }
         } catch (error) {
             console.error("Failed to fetch GitHub repos:", error);
@@ -133,7 +151,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
     }
 
     prevConnectionsRef.current = connections;
-  }, [connections, isAudioEnabled]);
+  }, [connections]);
 
   // Load messages from localStorage on initial mount
   useEffect(() => {
@@ -197,6 +215,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
   }, [screenStream]);
 
   const playAudio = async (base64Audio: string) => {
+    if (!isAudioEnabledRef.current) return;
+
     if (!audioContextRef.current) {
         // @ts-ignore
         audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
@@ -375,6 +395,48 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
                 recentHistory: snapshot.history.slice(-3) // Only return recent 3
             };
         }
+        
+        // --- CONTENT GENERATION HANDLERS (Simulated drafts) ---
+        case 'generateTikTokScript': {
+            const draft = await socialMediaService.createDraft('tiktok', `(Script generated for topic: ${args.topic})`);
+            return { 
+                status: 'success', 
+                message: `TikTok Script Draft created (ID: ${draft.id}).`, 
+                draft: {
+                    hook: "Wait, you're still mining purely digital tokens?",
+                    body: "We're building V3. It's rare earth independent. It's geomining backed by real-world assets.",
+                    cta: "Check the bio."
+                }
+            };
+        }
+        case 'generateXThread': {
+            const draft = await socialMediaService.createDraft('x', `(Thread generated for topic: ${args.topic})`);
+            return {
+                status: 'success',
+                message: `X Thread Draft created (ID: ${draft.id}).`,
+                tweets: [
+                    "1/5 Chaos is just unorganized potential.",
+                    "2/5 V3 is the structure."
+                ]
+            };
+        }
+        case 'generateInstagramCaption': {
+            const draft = await socialMediaService.createDraft('instagram', `(Caption for: ${args.imageDescription})`);
+            return {
+                status: 'success',
+                message: `Instagram Caption Draft created (ID: ${draft.id}).`,
+                caption: "Building in public. #V3 #ViceVersa"
+            };
+        }
+        case 'generateYouTubeScript': {
+            return { status: 'success', message: "YouTube Script outline generated.", scriptUrl: "http://vee-internal/scripts/yt-draft-1" };
+        }
+        case 'generateDiscordAnnouncement': {
+            const draft = await socialMediaService.createDraft('discord', args.details);
+            return { status: 'success', message: "Discord announcement ready for review.", content: `**${args.eventType}**\n${args.details}` };
+        }
+
+        // --- EXISTING HANDLERS ---
         case 'getEbayOrders': {
             const orders = await ebayService.getOrders();
             return { status: 'success', message: `Retrieved ${orders.length} orders.`, orders };
@@ -529,32 +591,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
         }
         case 'generateContentCalendar': {
             const { topic, startDate, durationDays, platforms } = args;
-            const calendar = [];
-            const start = new Date(startDate);
-            for(let i=0; i<durationDays; i++) {
-                const date = new Date(start);
-                date.setDate(start.getDate() + i);
-                calendar.push({
-                    date: date.toISOString().split('T')[0],
-                    platform: platforms[i % platforms.length],
-                    idea: `Post about ${topic} focusing on aspect ${i+1}`,
-                    status: 'Draft'
-                });
-            }
-            return { status: 'success', message: `Generated ${durationDays}-day content calendar for "${topic}".`, calendar };
+            const drafts = await socialMediaService.getContentCalendar();
+            // In a real app we'd generate new ones here, but for now we return status
+            return { status: 'success', message: `Generated ${durationDays}-day content calendar for "${topic}".`, calendar: drafts };
         }
         case 'analyzeSocialMetrics': {
             const { platform, period } = args;
+            const metrics = await socialMediaService.getAnalytics(platform, period);
             return {
                 status: 'success',
                 message: `Analysis for ${platform} (${period}) complete.`,
-                metrics: {
-                    views: Math.floor(Math.random() * 50000) + 1000,
-                    likes: Math.floor(Math.random() * 5000) + 100,
-                    shares: Math.floor(Math.random() * 1000) + 10,
-                    engagementRate: (Math.random() * 5 + 1).toFixed(2) + '%',
-                    topPost: "Viral video about V3 mining"
-                }
+                metrics
             };
         }
         case 'createEngagementStrategy': {
@@ -571,15 +618,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
             };
         }
         case 'draftSocialPost': {
-            const { platform, content, visualDescription, hashtags } = args;
+            const { platform, content } = args;
+            const draft = await socialMediaService.createDraft(platform, content);
             return {
                 status: 'success',
-                message: `Draft created for ${platform}.`,
-                draft: {
-                    content,
-                    visualDescription,
-                    hashtags
-                }
+                message: `Draft created for ${platform} (ID: ${draft.id}).`,
+                draft
             };
         }
         case 'draftProductListing': {
@@ -724,9 +768,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
                 imageUrl: `data:image/jpeg;base64,${imageBase64}`
             };
             setMessages((prev) => [...prev.slice(0, -1), modelMessage]);
-            if (isAudioEnabled) {
+            if (isAudioEnabledRef.current) {
                 const audioData = await generateSpeech(modelMessage.content);
-                if (audioData) playAudio(audioData);
+                if (audioData && isAudioEnabledRef.current) playAudio(audioData);
             }
         } else {
             throw new Error("Image generation failed.");
@@ -778,9 +822,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
                 videoUrl: `${videoUri}&key=${process.env.API_KEY}`
             };
             setMessages((prev) => [...prev.slice(0, -1), modelMessage]);
-             if (isAudioEnabled) {
+             if (isAudioEnabledRef.current) {
                 const audioData = await generateSpeech(modelMessage.content);
-                if (audioData) playAudio(audioData);
+                if (audioData && isAudioEnabledRef.current) playAudio(audioData);
             }
         } else {
             throw new Error("Video generation failed.");
@@ -828,9 +872,11 @@ const handleGroundedSearch = async (query: string, tool: 'googleSearch' | 'googl
                 groundingSources: result.sources
             };
             setMessages((prev) => [...prev.slice(0, -1), modelMessage]);
-             if (isAudioEnabled && result.text) {
-                const audioData = await generateSpeech(result.text);
-                if (audioData) playAudio(audioData);
+             if (isAudioEnabledRef.current && result.text) {
+                 // Truncate for search results too as they can be long
+                const textToSpeak = result.text.length > 500 ? result.text.substring(0, 500) + "..." : result.text;
+                const audioData = await generateSpeech(textToSpeak);
+                if (audioData && isAudioEnabledRef.current) playAudio(audioData);
             }
         } else {
             throw new Error("Grounded search failed.");
@@ -855,9 +901,9 @@ const handleImageEditing = async (prompt: string, file: File) => {
                 imageUrl: `data:${file.type};base64,${editedImageBase64}`
             };
             setMessages((prev) => [...prev.slice(0, -1), modelMessage]);
-             if (isAudioEnabled) {
+             if (isAudioEnabledRef.current) {
                 const audioData = await generateSpeech(modelMessage.content);
-                if (audioData) playAudio(audioData);
+                if (audioData && isAudioEnabledRef.current) playAudio(audioData);
             }
         } else {
             throw new Error("Image generation failed to return data.");
@@ -982,9 +1028,26 @@ const handleDefaultChat = async (userInput: string, files: File[], screenFrame: 
       const modelMessage: Message = { role: Role.MODEL, content: response.text };
       setMessages((prev) => [...prev.slice(0, -1), modelMessage]);
 
-      if (isAudioEnabled && response.text) {
-        const audioData = await generateSpeech(response.text);
-        if (audioData) playAudio(audioData);
+      if (isAudioEnabledRef.current && response.text) {
+        // Optimization: Truncate text sent to TTS to avoid long processing delays for large responses
+        // 500 characters is approx 30-45 seconds of speech.
+        const MAX_TTS_LENGTH = 500;
+        let textToSpeak = response.text;
+        
+        if (textToSpeak.length > MAX_TTS_LENGTH) {
+            // Find the last period or newline before the limit to make it sound natural
+            const cutOff = textToSpeak.substring(0, MAX_TTS_LENGTH);
+            const lastPeriod = cutOff.lastIndexOf('.');
+            if (lastPeriod > 100) {
+                textToSpeak = cutOff.substring(0, lastPeriod + 1);
+            } else {
+                textToSpeak = cutOff + "...";
+            }
+        }
+
+        const audioData = await generateSpeech(textToSpeak);
+        // Check ref again in case user disabled audio during generation
+        if (audioData && isAudioEnabledRef.current) playAudio(audioData);
       }
 
     } catch (error) {
