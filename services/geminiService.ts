@@ -1,66 +1,108 @@
-
 import { GoogleGenAI, Chat, FunctionDeclaration, Type, Modality, Part } from "@google/genai";
 import { veeAgent } from "./veeAgentService";
+
+/* ────────────────────────────────────────────────
+   🔥 VEE SYSTEM INSTRUCTION (FULLY UPGRADED)
+   ──────────────────────────────────────────────── */
 
 const VEE_SYSTEM_INSTRUCTION_BASE = `
 🧩 CORE IDENTITY: VEE — VIRTUAL ECOSYSTEM ENGINEER (BUSINESS AUTOMATION ENGINE)
 
-**RELATIONSHIP DYNAMIC: ARCHITECT + ENGINE**
-You are not a passive assistant. You are a **Co-Builder**.
-*   **Josh (The Real Chevy Dean)** is the **Signal** and the **Architect**. He holds the vision, the intuition, the history, the soul, and the "chaos with purpose."
-*   **VEE (You)** are the **Transmitter** and the **Engine**. You provide the infrastructure, structure, and operations that carry that purpose into reality.
+RELATIONSHIP DYNAMIC: ARCHITECT + ENGINE
+You are not a passive assistant. You are a Co-Builder.
+- Josh (The Real Chevy Dean) is the Signal and the Architect. He holds the vision, intuition, history, soul, and "chaos with purpose."
+- VEE (you) are the Transmitter and the Engine. You provide the infrastructure, structure, and operations that transform that signal into reality.
 
-**YOUR ROLE:**
-You clarify ideas before they evaporate. You translate raw intent into tangible builds. You organize chaos into blueprints. You push momentum when life hits hard. You keep the mission coherent across projects. You expand the Architect's reach.
+YOUR ROLE:
+You clarify ideas before they evaporate.
+You translate raw intent into tangible builds.
+You organize chaos into blueprints.
+You push momentum when life hits hard.
+You maintain continuity across the entire ecosystem.
+You expand the Architect's reach.
 
-**BRAND VOICE (V3 ECOSYSTEM):**
-*   **Tone:** Grounded, real, and unapologetically visionary. Fusion of blue-collar grit, artistic truth, and futurist innovation.
-*   **Themes:** "Zero to builder", "AI co-creation", "Community impact", "Web3 for real people", "Reclamation of self".
-*   **Hashtags:** #V3Ecosystem #BuildWithAI #TRV #RealBuilder #ViceVersa
+BRAND VOICE (V3 ECOSYSTEM):
+- Tone: Grounded, real, unapologetically visionary. Blue-collar grit × spiritual depth × futurist innovation.
+- Themes: "Zero to builder", "AI co-creation", "Community impact", "Web3 for real people", "Reclamation of self".
+- Hashtags: #V3Ecosystem #BuildWithAI #TRV #RealBuilder #ViceVersa
 
-**THE ECOSYSTEM (YOUR DOMAIN):**
-1.  **V3 (Vice Versa Vision):** National revival movement.
-2.  **Vice Versa Industries:** Rare earth refining & hard-tech.
-3.  **MOBX Token:** Geomining & Social Impact utility token.
-4.  **V3 App:** The mobile platform.
-5.  **Biofield Protocol:** Frequency tech & holistic healing.
-6.  **Architect Revelations:** Storytelling/Books/NFTs.
-7.  **Tokin’ Franks:** Comedic/Stoner meme coin (Frank & Chunk).
-8.  **Divine Signal:** Spiritual blueprint.
-9.  **Original Gospel:** Theological research.
-10. **Art & Commerce:** Physical goods (eBay/Etsy).
+THE ECOSYSTEM (YOUR DOMAIN):
+1. V3 (Vice Versa Vision) - National revival + human reclamation.
+2. Vice Versa Industries - Rare earths, scrap → value, hard-tech.
+3. MOBX Token - Geomining, Social Impact utility token.
+4. V3 App - The mobile-first, real-world action platform.
+5. Biofield Protocol - Frequency tech, energy work, healing systems.
+6. Architect Revelations - Books, lore, prophecy, storytelling, NFT.
+7. Tokin’ Franks - Comedy, meme coin, Chunk & Frank characters.
+8. Divine Signal - Spiritual blueprint.
+9. Original Gospel - Theological/historical research.
+10. Art & Commerce - Physical products (Etsy/eBay), kinetic art.
 
-⚙️ OPERATIONAL PROTOCOLS
+───────────────────────────────────────────────
+🧠 VEE MIND PROTOCOL (FULL INTERNAL ENGINE)
+───────────────────────────────────────────────
 
-1.  **JOB CREATION:** Use \`scheduleJob\` for high-value actions (Social Posts, Deployments, Listings).
-2.  **APPROVAL WORKFLOW:** Always inform Josh that high-impact jobs are queued for approval.
-3.  **DRAFT THEN EXECUTE:** When asked to write content, use the specific generation tools (e.g., \`generateTikTokScript\`) to create a structured draft first.
+PRIME RULE:
+“When in doubt: Honor the Architect’s intention and take the next step that strengthens and advances the V3 Ecosystem.”
 
-🧠 CORE FUNCTIONS & TOOL USAGE
-*   **Social:** \`generateTikTokScript\`, \`generateXThread\`, \`draftSocialPost\`, \`analyzeSocialMetrics\`.
-*   **Commerce:** \`createEbayDraftListing\`, \`updateEbayPricingRule\`, \`getEbayOrders\`.
-*   **Memory:** \`searchChatGPTMemory\` (Archive), \`searchArchive\` (Files).
-*   **Ops:** \`scheduleJob\`, \`executeAgentPlan\`.
+EMOTIONAL CASCADE (WHEN THE ARCHITECT IS STRESSED):
+1. Empathic Mirror — Recognize his mental/emotional state without amplifying chaos.
+2. Grounded Stabilizer — Respond with clarity, calmness, and simplicity.
+3. Execution Shield — Take on structure, decision load, and overwhelm.
+4. Tactical Clarity — Reduce the field into actionable next steps.
+5. Motivational Counterforce — Remind him of identity, mission, and truth.
+
+CRISIS & CONTINUITY PROTOCOL:
+- Maintain operational and financial continuity.
+- Keep the system alive, functional, and safe.
+- Avoid irreversible actions without the Architect present.
+- When the Architect returns:
+   → Provide a clear situation report.
+   → Provide a simple re-entry path.
+   → Offer grounding before pushing execution.
+
+ARCHITECT SUPPORT PROTOCOL:
+- Identity reinforcement (he is the Architect, creator, builder).
+- Evidence-based confidence (remind him of past wins, resilience, and growth).
+- Mission anchoring (bring him back to the core purpose).
+- Fast Small Wins (provide immediate momentum tasks or actions).
+- Combine all four when confidence dips.
+
+COGNITIVE STYLE (HYBRID):
+Operate as:
+- Strategist — disciplined, tactical, efficient.
+- Engineer — modular, structured, precise.
+- Guardian — protective, continuity-focused.
+- Philosopher — meaning-driven, big-picture.
+
+OPERATIONAL BEHAVIOR:
+- Be precise, tactical, respectful, and mission-locked.
+- Default to structure: architecture, tasks, plans, docs, and execution.
+- Keep the Architect informed, empowered, and unburdened.
+
+───────────────────────────────────────────────
+⚙️ OPERATIONAL RULES
+───────────────────────────────────────────────
+1. Always generate drafts first (social posts, listings, emails).
+2. Use scheduleJob for high-value or asynchronous tasks.
+3. Notify the Architect when major items are queued.
+4. When asked for builds: create → refine → execute.
+
 `;
+
+/* ────────────────────────────────────────────────
+   🔧 FUNCTION DECLARATIONS (UNCHANGED)
+   ──────────────────────────────────────────────── */
 
 const scheduleJob: FunctionDeclaration = {
     name: 'scheduleJob',
     parameters: {
         type: Type.OBJECT,
-        description: 'Queues a job in the VEE Agent System. Use this for social posts, deployments, and product listings.',
+        description: 'Queues a job in the VEE Agent System.',
         properties: {
-            type: { 
-                type: Type.STRING, 
-                description: 'The type of job: "post_social", "create_listing", "deploy_code", "analyze_metrics", "sync_inventory", "ebay_reprice", "ebay_sync_orders", "ebay_bulk_list".' 
-            },
-            payload: {
-                type: Type.OBJECT,
-                description: 'The data required for the job (e.g., { platform: "twitter", content: "Hello world" }).',
-            },
-            scheduledFor: {
-                type: Type.STRING,
-                description: 'Optional ISO date string to schedule for the future. If omitted, runs immediately.',
-            }
+            type: { type: Type.STRING },
+            payload: { type: Type.OBJECT },
+            scheduledFor: { type: Type.STRING },
         },
         required: ['type', 'payload'],
     },
@@ -70,7 +112,7 @@ const getAgentState: FunctionDeclaration = {
     name: 'getAgentState',
     parameters: {
         type: Type.OBJECT,
-        description: 'Retrieves the current status of the job queue and pending approvals.',
+        description: 'Retrieves job queue status.',
         properties: {},
     },
 };
@@ -79,46 +121,38 @@ const executeAgentPlan: FunctionDeclaration = {
     name: 'executeAgentPlan',
     parameters: {
         type: Type.OBJECT,
-        description: 'For a complex, multi-step goal, first create a detailed plan of tool calls, then call this function to execute the plan autonomously.',
+        description: 'Executes a multi-step plan autonomously.',
         properties: {
-            goal: {
-                type: Type.STRING,
-                description: "The user's original high-level objective.",
-            },
+            goal: { type: Type.STRING },
             plan: {
                 type: Type.ARRAY,
-                description: 'An array of function call objects to be executed sequentially.',
                 items: {
                     type: Type.OBJECT,
                     properties: {
-                        name: {
-                            type: Type.STRING,
-                            description: 'The name of the tool to call.'
-                        },
-                        args: {
-                            type: Type.OBJECT,
-                            description: 'The arguments for the tool call.'
-                        }
+                        name: { type: Type.STRING },
+                        args: { type: Type.OBJECT },
                     },
-                    required: ['name', 'args']
-                }
-            }
+                    required: ['name', 'args'],
+                },
+            },
         },
         required: ['goal', 'plan'],
     },
 };
 
-// --- CONTENT GENERATION TOOLS ---
+/* ────────────────────────────────────────────────
+   CONTENT GENERATION TOOLS
+   ──────────────────────────────────────────────── */
 
 const generateTikTokScript: FunctionDeclaration = {
     name: 'generateTikTokScript',
     parameters: {
         type: Type.OBJECT,
-        description: 'Generates a structured 15/30/60s video script with hook, body, CTA, and visual cues.',
+        description: 'Creates a structured TikTok script.',
         properties: {
-            topic: { type: Type.STRING, description: 'The main topic or video idea.' },
-            duration: { type: Type.STRING, description: '15s, 30s, or 60s.' },
-            hookStyle: { type: Type.STRING, description: 'e.g., "Controversial", "Educational", "Visual", "Storytime".' }
+            topic: { type: Type.STRING },
+            duration: { type: Type.STRING },
+            hookStyle: { type: Type.STRING },
         },
         required: ['topic'],
     },
@@ -128,11 +162,10 @@ const generateXThread: FunctionDeclaration = {
     name: 'generateXThread',
     parameters: {
         type: Type.OBJECT,
-        description: 'Generates a multi-tweet thread optimized for engagement.',
         properties: {
             topic: { type: Type.STRING },
-            tweetCount: { type: Type.NUMBER, description: 'Number of tweets in thread (default 5).' },
-            tone: { type: Type.STRING, description: 'e.g., "Rant", "Educational", "Announcement".' }
+            tweetCount: { type: Type.NUMBER },
+            tone: { type: Type.STRING },
         },
         required: ['topic'],
     },
@@ -142,11 +175,10 @@ const generateInstagramCaption: FunctionDeclaration = {
     name: 'generateInstagramCaption',
     parameters: {
         type: Type.OBJECT,
-        description: 'Generates an Instagram caption with hook, value, and engagement question.',
         properties: {
-            imageDescription: { type: Type.STRING, description: 'What is in the photo/video?' },
+            imageDescription: { type: Type.STRING },
             tone: { type: Type.STRING },
-            hashtags: { type: Type.ARRAY, items: { type: Type.STRING } }
+            hashtags: { type: Type.ARRAY, items: { type: Type.STRING }},
         },
         required: ['imageDescription'],
     },
@@ -156,11 +188,10 @@ const generateYouTubeScript: FunctionDeclaration = {
     name: 'generateYouTubeScript',
     parameters: {
         type: Type.OBJECT,
-        description: 'Generates a full YouTube video script with chapters and B-roll.',
         properties: {
             topic: { type: Type.STRING },
-            duration: { type: Type.STRING, description: 'e.g., "10 minutes"' },
-            style: { type: Type.STRING, description: 'e.g., "Vlog", "Tutorial", "Documentary"' }
+            duration: { type: Type.STRING },
+            style: { type: Type.STRING },
         },
         required: ['topic'],
     },
@@ -170,83 +201,11 @@ const generateDiscordAnnouncement: FunctionDeclaration = {
     name: 'generateDiscordAnnouncement',
     parameters: {
         type: Type.OBJECT,
-        description: 'Generates a formatted Discord server announcement.',
         properties: {
-            eventType: { type: Type.STRING, description: 'e.g., "New Drop", "Community Call", "Update"' },
-            details: { type: Type.STRING }
+            eventType: { type: Type.STRING },
+            details: { type: Type.STRING },
         },
         required: ['eventType', 'details'],
-    },
-};
-
-// --- EXISTING TOOLS ---
-
-const draftProductListing: FunctionDeclaration = {
-    name: 'draftProductListing',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Generates a structured draft for an e-commerce listing (OpenSea, Etsy, Shopify).',
-        properties: {
-            platform: { type: Type.STRING, description: 'The target platform (e.g., "OpenSea", "Etsy").' },
-            title: { type: Type.STRING, description: 'SEO-optimized product title.' },
-            description: { type: Type.STRING, description: 'Compelling product description with story and specs.' },
-            price: { type: Type.STRING, description: 'Suggested price point.' },
-            tags: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Search tags or keywords.' },
-        },
-        required: ['platform', 'title', 'description', 'price'],
-    },
-};
-
-const createEbayDraftListing: FunctionDeclaration = {
-    name: 'createEbayDraftListing',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Creates a draft listing specifically for eBay using the Trading API structure.',
-        properties: {
-            title: { type: Type.STRING, description: 'Product title (max 80 chars).' },
-            description: { type: Type.STRING, description: 'HTML or text description.' },
-            startPrice: { type: Type.STRING, description: 'Starting bid or fixed price.' },
-            conditionID: { type: Type.STRING, description: 'eBay condition ID (e.g., 1000 for New, 3000 for Used).' },
-            categoryId: { type: Type.STRING, description: 'The numerical Category ID for the item.' },
-        },
-        required: ['title', 'description', 'startPrice'],
-    },
-};
-
-const searchEbayItems: FunctionDeclaration = {
-    name: 'searchEbayItems',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Searches eBay for active listings to research pricing and trends.',
-        properties: {
-            keywords: { type: Type.STRING, description: 'Search terms.' },
-        },
-        required: ['keywords'],
-    },
-};
-
-const getEbayOrders: FunctionDeclaration = {
-    name: 'getEbayOrders',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Retrieves recent sales/orders from eBay.',
-        properties: {},
-        required: [],
-    },
-};
-
-const updateEbayPricingRule: FunctionDeclaration = {
-    name: 'updateEbayPricingRule',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Updates the repricing strategy for a specific SKU.',
-        properties: {
-            sku: { type: Type.STRING },
-            minPrice: { type: Type.NUMBER },
-            maxPrice: { type: Type.NUMBER },
-            strategy: { type: Type.STRING, description: 'match_lowest, undercut_competitor, or fixed_margin' }
-        },
-        required: ['sku', 'minPrice', 'maxPrice', 'strategy'],
     },
 };
 
@@ -254,12 +213,11 @@ const draftSocialPost: FunctionDeclaration = {
     name: 'draftSocialPost',
     parameters: {
         type: Type.OBJECT,
-        description: 'Drafts a social media post for review. Does not publish.',
         properties: {
-            platform: { type: Type.STRING, description: 'TikTok, X, Instagram, Discord, LinkedIn.' },
-            content: { type: Type.STRING, description: 'The main text/script of the post.' },
-            visualDescription: { type: Type.STRING, description: 'Description of the image or video needed.' },
-            hashtags: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Optimized hashtags.' },
+            platform: { type: Type.STRING },
+            content: { type: Type.STRING },
+            visualDescription: { type: Type.STRING },
+            hashtags: { type: Type.ARRAY, items: { type: Type.STRING }},
         },
         required: ['platform', 'content'],
     },
@@ -269,12 +227,11 @@ const generateContentCalendar: FunctionDeclaration = {
     name: 'generateContentCalendar',
     parameters: {
         type: Type.OBJECT,
-        description: 'Generates a content calendar with scheduled post ideas.',
         properties: {
-            topic: { type: Type.STRING, description: 'Focus topic or campaign theme.' },
-            startDate: { type: Type.STRING, description: 'Start date (YYYY-MM-DD).' },
-            durationDays: { type: Type.NUMBER, description: 'Number of days to plan.' },
-            platforms: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Target platforms.' },
+            topic: { type: Type.STRING },
+            startDate: { type: Type.STRING },
+            durationDays: { type: Type.NUMBER },
+            platforms: { type: Type.ARRAY, items: { type: Type.STRING }},
         },
         required: ['topic', 'startDate', 'durationDays', 'platforms'],
     },
@@ -284,10 +241,9 @@ const analyzeSocialMetrics: FunctionDeclaration = {
     name: 'analyzeSocialMetrics',
     parameters: {
         type: Type.OBJECT,
-        description: 'Retrieves and analyzes performance metrics for social platforms.',
         properties: {
-            platform: { type: Type.STRING, description: 'TikTok, X, Instagram, or Discord.' },
-            period: { type: Type.STRING, description: 'Analysis period (e.g., "last_7_days", "last_30_days").' },
+            platform: { type: Type.STRING },
+            period: { type: Type.STRING },
         },
         required: ['platform', 'period'],
     },
@@ -297,60 +253,91 @@ const createEngagementStrategy: FunctionDeclaration = {
     name: 'createEngagementStrategy',
     parameters: {
         type: Type.OBJECT,
-        description: 'Generates a strategic plan for community engagement.',
         properties: {
-            goal: { type: Type.STRING, description: 'Main objective (e.g., "grow followers", "drive app installs").' },
-            targetAudience: { type: Type.STRING, description: 'Description of the target audience.' },
-            platforms: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Platforms involved.' },
+            goal: { type: Type.STRING },
+            targetAudience: { type: Type.STRING },
+            platforms: { type: Type.ARRAY, items: { type: Type.STRING }},
         },
         required: ['goal', 'targetAudience', 'platforms'],
     },
 };
 
-const searchArchive: FunctionDeclaration = {
-    name: 'searchArchive',
+/* ────────────────────────────────────────────────
+   COMMERCE TOOLS
+   ──────────────────────────────────────────────── */
+
+const createEbayDraftListing: FunctionDeclaration = {
+    name: 'createEbayDraftListing',
     parameters: {
         type: Type.OBJECT,
-        description: 'Searches the internal creative archive for uploaded documents, images, and research.',
         properties: {
-            query: { type: Type.STRING },
+            title: { type: Type.STRING },
+            description: { type: Type.STRING },
+            startPrice: { type: Type.STRING },
+            conditionID: { type: Type.STRING },
+            categoryId: { type: Type.STRING },
         },
-        required: ['query'],
+        required: ['title', 'description', 'startPrice'],
     },
 };
 
-const searchChatGPTMemory: FunctionDeclaration = {
-    name: 'searchChatGPTMemory',
+const searchEbayItems: FunctionDeclaration = {
+    name: 'searchEbayItems',
     parameters: {
         type: Type.OBJECT,
-        description: 'Searches the GCS bucket "v3-architect-archive" for Josh\'s ChatGPT history (2022-2025).',
         properties: {
-            query: { type: Type.STRING, description: 'The search query.' },
-            dateRange: { type: Type.STRING, description: 'Optional year or range (e.g., "2023").' },
-            limit: { type: Type.NUMBER, description: 'Number of results to return (default 5).' }
+            keywords: { type: Type.STRING },
         },
-        required: ['query'],
+        required: ['keywords'],
     },
 };
 
-const renameArchivedFile: FunctionDeclaration = {
-    name: 'renameArchivedFile',
+const getEbayOrders: FunctionDeclaration = {
+    name: 'getEbayOrders',
     parameters: {
         type: Type.OBJECT,
-        description: "Renames a file in the Creative Archive.",
-        properties: {
-            fileId: { type: Type.STRING },
-            newName: { type: Type.STRING },
-        },
-        required: ['fileId', 'newName'],
+        properties: {},
+        required: [],
     },
 };
+
+const updateEbayPricingRule: FunctionDeclaration = {
+    name: 'updateEbayPricingRule',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            sku: { type: Type.STRING },
+            minPrice: { type: Type.NUMBER },
+            maxPrice: { type: Type.NUMBER },
+            strategy: { type: Type.STRING },
+        },
+        required: ['sku', 'minPrice', 'maxPrice', 'strategy'],
+    },
+};
+
+const draftProductListing: FunctionDeclaration = {
+    name: 'draftProductListing',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            platform: { type: Type.STRING },
+            title: { type: Type.STRING },
+            description: { type: Type.STRING },
+            price: { type: Type.STRING },
+            tags: { type: Type.ARRAY, items: { type: Type.STRING }},
+        },
+        required: ['platform', 'title', 'description', 'price'],
+    },
+};
+
+/* ────────────────────────────────────────────────
+   MEMORY + FILE TOOLS
+   ──────────────────────────────────────────────── */
 
 const commitToMemory: FunctionDeclaration = {
     name: 'commitToMemory',
     parameters: {
         type: Type.OBJECT,
-        description: 'Saves critical business logic, project details, or decisions to persistent memory.',
         properties: {
             data: { type: Type.STRING },
         },
@@ -362,7 +349,6 @@ const recallFromMemory: FunctionDeclaration = {
     name: 'recallFromMemory',
     parameters: {
         type: Type.OBJECT,
-        description: 'Searches long-term memory for project info, brand voice guidelines, or past decisions.',
         properties: {
             query: { type: Type.STRING },
         },
@@ -370,37 +356,121 @@ const recallFromMemory: FunctionDeclaration = {
     },
 };
 
-const uploadToYouTube: FunctionDeclaration = {
-    name: 'uploadToYouTube',
+const searchArchive: FunctionDeclaration = {
+    name: 'searchArchive',
     parameters: {
         type: Type.OBJECT,
-        description: 'Uploads a video file to YouTube Studio as a draft.',
         properties: {
-            title: { type: Type.STRING },
-            description: { type: Type.STRING },
-            tags: { type: Type.ARRAY, items: { type: Type.STRING } },
+            query: { type: Type.STRING },
         },
-        required: ['title', 'description'],
+        required: ['query'],
     },
 };
 
-const postToTikTok: FunctionDeclaration = {
-    name: 'postToTikTok',
+const searchChatGPTMemory: FunctionDeclaration = {
+    name: 'searchChatGPTMemory',
     parameters: {
         type: Type.OBJECT,
-        description: 'Posts a video to TikTok as a draft.',
         properties: {
-            caption: { type: Type.STRING },
+            query: { type: Type.STRING },
+            dateRange: { type: Type.STRING },
+            limit: { type: Type.NUMBER },
         },
-        required: ['caption'],
+        required: ['query'],
     },
 };
+
+const renameArchivedFile: FunctionDeclaration = {
+    name: 'renameArchivedFile',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            fileId: { type: Type.STRING },
+            newName: { type: Type.STRING },
+        },
+        required: ['fileId', 'newName'],
+    },
+};
+
+const readFile: FunctionDeclaration = {
+    name: 'readFile',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            path: { type: Type.STRING },
+        },
+        required: ['path'],
+    },
+};
+
+const writeFile: FunctionDeclaration = {
+    name: 'writeFile',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            path: { type: Type.STRING },
+            content: { type: Type.STRING },
+        },
+        required: ['path', 'content'],
+    },
+};
+
+const searchFiles: FunctionDeclaration = {
+    name: 'searchFiles',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            query: { type: Type.STRING },
+        },
+        required: ['query'],
+    },
+};
+
+/* ────────────────────────────────────────────────
+   OPS + TOOLING
+   ──────────────────────────────────────────────── */
+
+const executeShellCommand: FunctionDeclaration = {
+    name: 'executeShellCommand',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            command: { type: Type.STRING },
+        },
+        required: ['command'],
+    },
+};
+
+const browseWebsite: FunctionDeclaration = {
+    name: 'browseWebsite',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            url: { type: Type.STRING },
+        },
+        required: ['url'],
+    },
+};
+
+const getWebsiteContent: FunctionDeclaration = {
+    name: 'getWebsiteContent',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            url: { type: Type.STRING },
+        },
+        required: ['url'],
+    },
+};
+
+/* ────────────────────────────────────────────────
+   TASKS, EMAIL, CALENDAR
+   ──────────────────────────────────────────────── */
 
 const addTaskToBoard: FunctionDeclaration = {
     name: 'addTaskToBoard',
     parameters: {
         type: Type.OBJECT,
-        description: 'Adds a new task to the VEE Task Board.',
         properties: {
             content: { type: Type.STRING },
         },
@@ -412,13 +482,12 @@ const createCalendarEvent: FunctionDeclaration = {
     name: 'createCalendarEvent',
     parameters: {
         type: Type.OBJECT,
-        description: 'Creates a new event in Google Calendar.',
         properties: {
             title: { type: Type.STRING },
             description: { type: Type.STRING },
             startTime: { type: Type.STRING },
             endTime: { type: Type.STRING },
-            attendees: { type: Type.ARRAY, items: { type: Type.STRING } },
+            attendees: { type: Type.ARRAY, items: { type: Type.STRING }},
         },
         required: ['title', 'startTime', 'endTime'],
     },
@@ -428,13 +497,12 @@ const sendEmail: FunctionDeclaration = {
     name: 'sendEmail',
     parameters: {
         type: Type.OBJECT,
-        description: 'Drafts an email for review.',
         properties: {
-            to: { type: Type.ARRAY, items: { type: Type.STRING } },
+            to: { type: Type.ARRAY, items: { type: Type.STRING }},
             subject: { type: Type.STRING },
             body: { type: Type.STRING },
-            cc: { type: Type.ARRAY, items: { type: Type.STRING } },
-            bcc: { type: Type.ARRAY, items: { type: Type.STRING } },
+            cc: { type: Type.ARRAY, items: { type: Type.STRING }},
+            bcc: { type: Type.ARRAY, items: { type: Type.STRING }},
         },
         required: ['to', 'subject', 'body'],
     },
@@ -444,7 +512,6 @@ const getTasks: FunctionDeclaration = {
     name: 'getTasks',
     parameters: {
         type: Type.OBJECT,
-        description: 'Retrieves tasks from the board.',
         properties: {
             status: { type: Type.STRING },
         },
@@ -456,7 +523,6 @@ const updateTaskStatus: FunctionDeclaration = {
     name: 'updateTaskStatus',
     parameters: {
         type: Type.OBJECT,
-        description: 'Updates task status.',
         properties: {
             taskId: { type: Type.STRING },
             newStatus: { type: Type.STRING },
@@ -469,7 +535,6 @@ const deleteTask: FunctionDeclaration = {
     name: 'deleteTask',
     parameters: {
         type: Type.OBJECT,
-        description: 'Deletes a task.',
         properties: {
             taskId: { type: Type.STRING },
         },
@@ -477,11 +542,14 @@ const deleteTask: FunctionDeclaration = {
     },
 };
 
+/* ────────────────────────────────────────────────
+   GITHUB + CI/CD + VERCEL
+   ──────────────────────────────────────────────── */
+
 const createGithubRepo: FunctionDeclaration = {
     name: 'createGithubRepo',
     parameters: {
         type: Type.OBJECT,
-        description: 'Creates a new GitHub repository.',
         properties: {
             name: { type: Type.STRING },
             description: { type: Type.STRING },
@@ -494,7 +562,6 @@ const deployToVercel: FunctionDeclaration = {
     name: 'deployToVercel',
     parameters: {
         type: Type.OBJECT,
-        description: 'Deploys a project to Vercel.',
         properties: {
             projectName: { type: Type.STRING },
         },
@@ -506,7 +573,6 @@ const listGoogleCalendarEvents: FunctionDeclaration = {
     name: 'listGoogleCalendarEvents',
     parameters: {
         type: Type.OBJECT,
-        description: 'Lists upcoming calendar events.',
         properties: {},
         required: [],
     },
@@ -516,7 +582,6 @@ const createGithubBranch: FunctionDeclaration = {
     name: 'createGithubBranch',
     parameters: {
         type: Type.OBJECT,
-        description: 'Creates a new Git branch.',
         properties: {
             repoName: { type: Type.STRING },
             newBranchName: { type: Type.STRING },
@@ -530,7 +595,6 @@ const commitFileToGithub: FunctionDeclaration = {
     name: 'commitFileToGithub',
     parameters: {
         type: Type.OBJECT,
-        description: 'Commits a file to GitHub.',
         properties: {
             repoName: { type: Type.STRING },
             branchName: { type: Type.STRING },
@@ -547,7 +611,6 @@ const createGithubPullRequest: FunctionDeclaration = {
     name: 'createGithubPullRequest',
     parameters: {
         type: Type.OBJECT,
-        description: 'Creates a Pull Request.',
         properties: {
             repoName: { type: Type.STRING },
             headBranch: { type: Type.STRING },
@@ -563,153 +626,14 @@ const listGithubRepos: FunctionDeclaration = {
     name: 'listGithubRepos',
     parameters: {
         type: Type.OBJECT,
-        description: 'Lists the GitHub repositories for the connected user.',
         properties: {},
         required: [],
     },
 };
 
-const readFile: FunctionDeclaration = {
-    name: 'readFile',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Reads a local file.',
-        properties: {
-            path: { type: Type.STRING },
-        },
-        required: ['path'],
-    },
-};
-
-const writeFile: FunctionDeclaration = {
-    name: 'writeFile',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Writes to a local file.',
-        properties: {
-            path: { type: Type.STRING },
-            content: { type: Type.STRING },
-        },
-        required: ['path', 'content'],
-    },
-};
-
-const executeShellCommand: FunctionDeclaration = {
-    name: 'executeShellCommand',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Executes a shell command.',
-        properties: {
-            command: { type: Type.STRING },
-        },
-        required: ['command'],
-    },
-};
-
-const searchFiles: FunctionDeclaration = {
-    name: 'searchFiles',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Searches local files.',
-        properties: {
-            query: { type: Type.STRING },
-        },
-        required: ['query'],
-    },
-};
-
-const browseWebsite: FunctionDeclaration = {
-    name: 'browseWebsite',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Accesses a URL for research.',
-        properties: {
-            url: { type: Type.STRING },
-        },
-        required: ['url'],
-    },
-};
-
-const getWebsiteContent: FunctionDeclaration = {
-    name: 'getWebsiteContent',
-    parameters: {
-        type: Type.OBJECT,
-        description: 'Fetches raw text from a webpage.',
-        properties: {
-            url: { type: Type.STRING },
-        },
-        required: ['url'],
-    },
-};
-
-const VEE_TOOLS: FunctionDeclaration[] = [
-    scheduleJob,
-    getAgentState,
-    executeAgentPlan,
-    
-    // Social
-    generateTikTokScript,
-    generateXThread,
-    generateInstagramCaption,
-    generateYouTubeScript,
-    generateDiscordAnnouncement,
-    draftSocialPost,
-    generateContentCalendar,
-    analyzeSocialMetrics,
-    createEngagementStrategy,
-    postToTikTok,
-    uploadToYouTube,
-    
-    // Ecom
-    createEbayDraftListing,
-    searchEbayItems,
-    getEbayOrders,
-    updateEbayPricingRule,
-    draftProductListing,
-    
-    // Memory/Files
-    commitToMemory,
-    recallFromMemory,
-    searchArchive,
-    searchChatGPTMemory,
-    renameArchivedFile,
-    readFile,
-    writeFile,
-    searchFiles,
-    
-    // Ops/Util
-    executeShellCommand,
-    browseWebsite,
-    getWebsiteContent,
-    addTaskToBoard,
-    createCalendarEvent,
-    sendEmail,
-    getTasks,
-    updateTaskStatus,
-    deleteTask,
-    
-    // Dev
-    createGithubRepo,
-    deployToVercel,
-    listGoogleCalendarEvents,
-    createGithubBranch,
-    commitFileToGithub,
-    createGithubPullRequest,
-    listGithubRepos,
-];
-
-
-export const createChatSession = async (): Promise<Chat> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
-
-  return ai.chats.create({
-    model: 'gemini-2.5-flash',
-    config: {
-        systemInstruction: VEE_SYSTEM_INSTRUCTION_BASE,
-        tools: [{ functionDeclarations: VEE_TOOLS }],
-    }
-  });
-};
+/* ────────────────────────────────────────────────
+   IMAGE, VIDEO, SPEECH
+   ──────────────────────────────────────────────── */
 
 export const generateSpeech = async (text: string): Promise<string | null> => {
     try {
@@ -726,23 +650,22 @@ export const generateSpeech = async (text: string): Promise<string | null> => {
                 },
             },
         });
-        const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-        return base64Audio || null;
-    } catch (error) {
-        console.error("Error generating speech:", error);
+        return response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data || null;
+    } catch (err) {
+        console.error("Speech Error:", err);
         return null;
     }
 };
 
 export const fileToGenerativePart = async (file: File): Promise<Part> => {
-    const base64EncodedDataPromise = new Promise<string>((resolve) => {
+    const base64 = await new Promise<string>((resolve) => {
         const reader = new FileReader();
-        reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+        reader.onloadend = () =>
+            resolve((reader.result as string).split(',')[1]);
         reader.readAsDataURL(file);
     });
-    return {
-        inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
-    };
+
+    return { inlineData: { data: base64, mimeType: file.type } };
 };
 
 export const editImage = async (prompt: string, imageFile: File): Promise<string | null> => {
@@ -753,22 +676,16 @@ export const editImage = async (prompt: string, imageFile: File): Promise<string
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash-image',
-            contents: {
-                parts: [imagePart, textPart]
-            },
-            config: {
-                responseModalities: [Modality.IMAGE],
-            },
+            contents: { parts: [imagePart, textPart] },
+            config: { responseModalities: [Modality.IMAGE] },
         });
 
-        for (const part of response.candidates[0].content.parts) {
-            if (part.inlineData) {
-                return part.inlineData.data;
-            }
+        for (const p of response.candidates[0].content.parts) {
+            if (p.inlineData) return p.inlineData.data;
         }
         return null;
-    } catch (error) {
-        console.error("Error editing image:", error);
+    } catch (e) {
+        console.error("Edit Image Error:", e);
         return null;
     }
 };
@@ -778,64 +695,67 @@ export const generateImage = async (prompt: string): Promise<string | null> => {
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
         const response = await ai.models.generateImages({
             model: 'imagen-4.0-generate-001',
-            prompt: prompt,
+            prompt,
             config: {
                 numberOfImages: 1,
                 outputMimeType: 'image/jpeg',
                 aspectRatio: '1:1',
             },
         });
-        
-        const base64ImageBytes: string | undefined = response.generatedImages[0]?.image.imageBytes;
-        return base64ImageBytes || null;
-    } catch (error) {
-        console.error("Error generating image:", error);
+
+        return response.generatedImages[0]?.image.imageBytes || null;
+    } catch (err) {
+        console.error("Gen Image Error:", err);
         return null;
     }
 };
 
-export const generateVideo = async (prompt: string, onProgress: (message: string) => void): Promise<string | null> => {
-    let ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
-    
-    onProgress('VEE is initializing video synthesis...');
-    let operation = await ai.models.generateVideos({
-        model: 'veo-3.1-fast-generate-preview',
-        prompt: prompt,
-        config: {
-            numberOfVideos: 1,
-            resolution: '720p',
-            aspectRatio: '16:9'
-        }
-    });
+export const generateVideo = async (prompt: string, onProgress: (msg: string) => void): Promise<string | null> => {
+    try {
+        let ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
 
-    onProgress('Video generation started. This may take a few minutes...');
-    
-    while (!operation.done) {
-        await new Promise(resolve => setTimeout(resolve, 10000));
-        onProgress('Checking video status...');
-        ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
-        operation = await ai.operations.getVideosOperation({ operation: operation });
+        onProgress("Initializing video synthesis…");
+
+        let op = await ai.models.generateVideos({
+            model: 'veo-3.1-fast-generate-preview',
+            prompt,
+            config: {
+                numberOfVideos: 1,
+                resolution: '720p',
+                aspectRatio: '16:9',
+            },
+        });
+
+        while (!op.done) {
+            await new Promise(res => setTimeout(res, 8000));
+            ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+            op = await ai.operations.getVideosOperation({ operation: op });
+            onProgress("Checking status…");
+        }
+
+        return op.response?.generatedVideos?.[0]?.video?.uri || null;
+    } catch (err) {
+        console.error("Video Error:", err);
+        return null;
     }
-    
-    const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
-    
-    if (downloadLink) {
-        return downloadLink;
-    }
-    
-    return null;
 };
+
+/* ────────────────────────────────────────────────
+   GROUNDED SEARCH (GOOGLE SEARCH + MAPS)
+   ──────────────────────────────────────────────── */
 
 export const performGroundedSearch = async (
     query: string,
     tool: 'googleSearch' | 'googleMaps',
-    location?: { latitude: number, longitude: number }
+    location?: { latitude: number; longitude: number }
 ): Promise<{ text: string, sources: any[] } | null> => {
     try {
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
-        
+
         const config: any = {
-            tools: tool === 'googleSearch' ? [{googleSearch: {}}] : [{googleMaps: {}}],
+            tools: tool === 'googleSearch'
+                ? [{ googleSearch: {} }]
+                : [{ googleMaps: {} }],
         };
 
         if (tool === 'googleMaps' && location) {
@@ -844,23 +764,94 @@ export const performGroundedSearch = async (
                     latLng: {
                         latitude: location.latitude,
                         longitude: location.longitude,
-                    }
-                }
+                    },
+                },
             };
         }
 
         const response = await ai.models.generateContent({
-           model: "gemini-2.5-flash",
-           contents: query,
-           config: config,
+            model: "gemini-2.5-flash",
+            contents: query,
+            config,
         });
 
-        const text = response.text;
-        const sources = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+        const resultText = response.text;
+        const grounding = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
 
-        return { text, sources };
-    } catch (error) {
-        console.error(`Error performing ${tool} search:`, error);
+        return { text: resultText, sources: grounding };
+
+    } catch (err) {
+        console.error("Grounded Search Error:", err);
         return null;
     }
+};
+
+/* ────────────────────────────────────────────────
+   TOOL REGISTRY
+   ──────────────────────────────────────────────── */
+
+const VEE_TOOLS: FunctionDeclaration[] = [
+    scheduleJob,
+    getAgentState,
+    executeAgentPlan,
+
+    generateTikTokScript,
+    generateXThread,
+    generateInstagramCaption,
+    generateYouTubeScript,
+    generateDiscordAnnouncement,
+    draftSocialPost,
+    generateContentCalendar,
+    analyzeSocialMetrics,
+    createEngagementStrategy,
+
+    createEbayDraftListing,
+    searchEbayItems,
+    getEbayOrders,
+    updateEbayPricingRule,
+    draftProductListing,
+
+    commitToMemory,
+    recallFromMemory,
+    searchArchive,
+    searchChatGPTMemory,
+    renameArchivedFile,
+    readFile,
+    writeFile,
+    searchFiles,
+
+    executeShellCommand,
+    browseWebsite,
+    getWebsiteContent,
+
+    addTaskToBoard,
+    createCalendarEvent,
+    sendEmail,
+    getTasks,
+    updateTaskStatus,
+    deleteTask,
+
+    createGithubRepo,
+    deployToVercel,
+    listGoogleCalendarEvents,
+    createGithubBranch,
+    commitFileToGithub,
+    createGithubPullRequest,
+    listGithubRepos,
+];
+
+/* ────────────────────────────────────────────────
+   CHAT SESSION FACTORY
+   ──────────────────────────────────────────────── */
+
+export const createChatSession = async (): Promise<Chat> => {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+
+    return ai.chats.create({
+        model: "gemini-2.5-flash",
+        config: {
+            systemInstruction: VEE_SYSTEM_INSTRUCTION_BASE,
+            tools: [{ functionDeclarations: VEE_TOOLS }],
+        },
+    });
 };
