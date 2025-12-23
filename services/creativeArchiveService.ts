@@ -102,14 +102,18 @@ const readFileContent = (file: File): Promise<string | null> => {
 
         const textLikeTypes = ['text/', 'application/json', 'application/javascript', 'application/xml'];
         if (textLikeTypes.some(type => file.type.startsWith(type)) || file.name.endsWith('.md') || file.name.endsWith('.txt')) {
-             const reader = new FileReader();
+            const reader = new FileReader();
             reader.onload = (event) => resolve(event.target?.result as string);
             reader.onerror = () => resolve(null);
             reader.readAsText(file);
             return;
         }
 
-        resolve(null);
+        // Fallback: Read as Data URL (Base64) for all other types (PDF, Zip, etc.)
+        const reader = new FileReader();
+        reader.onload = (event) => resolve(event.target?.result as string);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
     });
 };
 
@@ -119,7 +123,7 @@ const readFileContent = (file: File): Promise<string | null> => {
 export const uploadFile = async (file: File, projectId: string): Promise<void> => {
     const content = await readFileContent(file);
     const type = determineFileType(file.type);
-    
+
     // Construct GCS Key: {projectId}/{type}/{filename}
     // Sanitize filename
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
@@ -133,7 +137,7 @@ export const uploadFile = async (file: File, projectId: string): Promise<void> =
         uploadedBy: 'user',
         description: 'Uploaded via VEE Web UI'
     };
-    
+
     const newObject: ArchivedFile = {
         id: crypto.randomUUID(), // Generation ID
         gcsPath,
@@ -215,7 +219,7 @@ export const searchFiles = async (query: string, projectId?: string): Promise<{ 
         .filter(file => {
             // Scope check
             if (projectId && file.metadata.projectId !== projectId) return false;
-            
+
             // Content check
             return (
                 file.name.toLowerCase().includes(lowerCaseQuery) ||
@@ -229,11 +233,11 @@ export const searchFiles = async (query: string, projectId?: string): Promise<{ 
             size: file.size,
             updated: file.updated,
             metadata: file.metadata,
-            contentSnippet: (file.content && file.metadata.type !== 'zip' && !file.metadata.contentType.startsWith('image/')) 
-                ? file.content.substring(0, 150) + '...' 
+            contentSnippet: (file.content && file.metadata.type !== 'zip' && !file.metadata.contentType.startsWith('image/'))
+                ? file.content.substring(0, 150) + '...'
                 : null
         }));
-        
+
     results.sort((a, b) => new Date(b.updated!).getTime() - new Date(a.updated!).getTime());
 
     return {
@@ -248,9 +252,9 @@ export const searchFiles = async (query: string, projectId?: string): Promise<{ 
  */
 export const searchChatGPTMemory = async (query: string, dateRange?: string, limit: number = 5) => {
     console.log(`[GCS Sim]: Searching bucket '${CHATGPT_ARCHIVE_BUCKET}' prefix 'ChatGPT_Data/' for: "${query}"`);
-    
+
     const lowerQuery = query.toLowerCase();
-    
+
     // Simulate scoring/ranking
     const scoredResults = mockChatGPTArchive.map(entry => {
         let score = 0;
@@ -267,4 +271,94 @@ export const searchChatGPTMemory = async (query: string, dateRange?: string, lim
         source: `gs://${CHATGPT_ARCHIVE_BUCKET}/ChatGPT_Data/`,
         results: scoredResults.slice(0, limit)
     };
+};
+
+/**
+ * Unzips an archived file and stores contents as new files.
+ */
+import JSZip from 'jszip';
+
+export const unzipFile = async (gcsPath: string): Promise<string[]> => {
+    const fileIndex = gcsBucket.findIndex(f => f.gcsPath === gcsPath);
+    if (fileIndex === -1) {
+        throw new Error(`File not found: ${gcsPath}`);
+    }
+
+    const file = gcsBucket[fileIndex];
+    if (!file.content) {
+        throw new Error(`File has no content: ${gcsPath}`);
+    }
+
+    // Extract Base64 data
+    const base64Data = file.content.split(',')[1];
+    if (!base64Data) {
+        throw new Error(`Invalid content format for: ${gcsPath}`);
+    }
+
+    try {
+        const zip = new JSZip();
+        const loadedZip = await zip.loadAsync(base64Data, { base64: true });
+        const newFiles: string[] = [];
+        const projectId = file.metadata.projectId;
+
+        // Iterate and save files
+        const promises: Promise<void>[] = [];
+
+        loadedZip.forEach((relativePath, zipEntry) => {
+            if (zipEntry.dir) return; // Skip directories
+
+            const promise = async () => {
+                const contentBlob = await zipEntry.async('blob');
+                // Convert Blob to Base64 Data URL for storage
+                const reader = new FileReader();
+                const base64Content = await new Promise<string>((resolve) => {
+                    reader.onloadend = () => resolve(reader.result as string);
+                    reader.readAsDataURL(contentBlob);
+                });
+
+                // Construct new path: {projectId}/upload/{zipName}/{relativePath}
+                // Sanitize zip name to use as folder
+                const zipFolderName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9.-]/g, '_');
+                const safeRelativePath = relativePath.split('/').map(p => p.replace(/[^a-zA-Z0-9.-]/g, '_')).join('/');
+
+                const newGcsPath = `${projectId}/upload/${zipFolderName}/${safeRelativePath}`;
+
+                const newFile: ArchivedFile = {
+                    id: crypto.randomUUID(),
+                    gcsPath: newGcsPath,
+                    name: zipEntry.name.split('/').pop() || zipEntry.name,
+                    size: (zipEntry as any)._data.uncompressedSize || 0,
+                    updated: new Date().toISOString(),
+                    content: base64Content,
+                    metadata: {
+                        projectId,
+                        type: 'upload',
+                        contentType: 'application/octet-stream', // Generic fallback
+                        originalName: zipEntry.name,
+                        uploadedBy: 'vee_agent',
+                        description: `Extracted from ${file.name}`
+                    }
+                };
+
+                // Upsert
+                const existingIdx = gcsBucket.findIndex(f => f.gcsPath === newGcsPath);
+                if (existingIdx >= 0) {
+                    gcsBucket[existingIdx] = newFile;
+                } else {
+                    gcsBucket.push(newFile);
+                }
+                newFiles.push(newGcsPath);
+            };
+            promises.push(promise());
+        });
+
+        await Promise.all(promises);
+        saveBucket();
+        console.log(`[GCS Sim]: Unzipped ${gcsPath} -> ${newFiles.length} files.`);
+        return newFiles;
+
+    } catch (error) {
+        console.error("Unzip failed:", error);
+        throw new Error(`Failed to unzip file: ${(error as Error).message}`);
+    }
 };

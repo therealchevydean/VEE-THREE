@@ -4,14 +4,14 @@ import { ArchivedFile } from '../types';
 
 // --- Icon Components ---
 const XMarkIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
-  </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
+    </svg>
 );
 const UploadIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path fillRule="evenodd" d="M11.25 2.25c.414 0 .75.336.75.75v11.59l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75z" clipRule="evenodd" />
-      <path d="M5.25 18.75a.75.75 0 000 1.5h13.5a.75.75 0 000-1.5H5.25z" />
+        <path fillRule="evenodd" d="M11.25 2.25c.414 0 .75.336.75.75v11.59l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75z" clipRule="evenodd" />
+        <path d="M5.25 18.75a.75.75 0 000 1.5h13.5a.75.75 0 000-1.5H5.25z" />
     </svg>
 );
 const SearchIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -25,31 +25,43 @@ const FileIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 const TrashIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
-    <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.58.22-2.365.468a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4.888c-1.75 0-3.47.08-5.164.24a.75.75 0 01-.722-.684l-.004-.018a.75.75 0 01.683-.722A42.533 42.533 0 0110 3.388c1.75 0 3.47.08 5.164.24a.75.75 0 01.683.722l-.004.018a.75.75 0 01-.722.684A42.533 42.533 0 0110 4.888z" clipRule="evenodd" />
-  </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.58.22-2.365.468a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4.888c-1.75 0-3.47.08-5.164.24a.75.75 0 01-.722-.684l-.004-.018a.75.75 0 01.683-.722A42.533 42.533 0 0110 3.388c1.75 0 3.47.08 5.164.24a.75.75 0 01.683.722l-.004.018a.75.75 0 01-.722.684A42.533 42.533 0 0110 4.888z" clipRule="evenodd" />
+    </svg>
 );
 const EditIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
-    <path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" />
-    <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" />
-  </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+        <path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" />
+        <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" />
+    </svg>
 );
 const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
-    <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.052-.143z" clipRule="evenodd" />
-  </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.052-.143z" clipRule="evenodd" />
+    </svg>
+);
+const DownloadIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75z" clipRule="evenodd" />
+        <path fillRule="evenodd" d="M2.25 15.75a.75.75 0 01.75.75V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-1.5a.75.75 0 011.5 0V18a3.75 3.75 0 01-3.75 3.75H5.25A3.75 3.75 0 011.5 18v-1.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
+    </svg>
+);
+const CopyIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M17.663 3.118c.225.015.45.032.673.05C19.876 3.298 21 4.604 21 6.109v9.642c0 1.985-1.648 3.595-3.633 3.595H11.25c-1.985 0-3.633-1.61-3.633-3.595V6.109c0-1.505 1.124-2.811 2.664-2.941.223-.018.448-.035.673-.05C11.4 3.08 11.9 3 12.406 3c.506 0 1.006.08 1.506.118a24.16 24.16 0 012.75.05c.5.038 1.001.118 1.501.118zm-1.506 2.05c-1.006-.08-2.012-.118-3.018-.118-.506 0-1.006.038-1.506.118v.002a2.25 2.25 0 00-2.06 2.246v9.642a2.1 2.1 0 002.1 2.095h6.133a2.1 2.1 0 002.1-2.095V7.416a2.25 2.25 0 00-2.06-2.246v-.002z" clipRule="evenodd" />
+        <path d="M7.5 3a2.25 2.25 0 00-2.25 2.25v9.642a2.1 2.1 0 00.334 1.115C3.996 15.65 2.25 14.075 2.25 12.109V6.109c0-1.985 1.648-3.595 3.633-3.595h1.617z" />
+    </svg>
 );
 
 
 interface CreativeArchiveProps {
-  isOpen: boolean;
-  onClose: () => void;
-  files: ArchivedFile[];
-  onUpload: (files: File[]) => void;
-  onDelete: (id: string) => void;
-  onRename: (id: string, newName: string) => void;
-  activeWorkspace: string;
+    isOpen: boolean;
+    onClose: () => void;
+    files: ArchivedFile[];
+    onUpload: (files: File[]) => void;
+    onDelete: (id: string) => void;
+    onRename: (id: string, newName: string) => void;
+    activeWorkspace: string;
 }
 
 const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, files, onUpload, onDelete, onRename, activeWorkspace }) => {
@@ -77,10 +89,33 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
         }
         setEditingFile(null);
     };
-    
+
+    const handleDownload = (file: ArchivedFile) => {
+        if (!file.content) return;
+
+        const link = document.createElement('a');
+        link.download = file.name;
+
+        if (file.content.startsWith('data:')) {
+            link.href = file.content;
+        } else {
+            // Text content
+            const blob = new Blob([file.content], { type: file.metadata.contentType || 'text/plain' });
+            link.href = URL.createObjectURL(blob);
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleCopy = (content: string) => {
+        navigator.clipboard.writeText(content);
+    };
+
     // Filter by Search Query (Files are already filtered by activeWorkspace in parent)
     const filteredFiles = files.filter(file => file.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+
     if (!isOpen) return null;
 
     const formatBytes = (bytes: number, decimals = 2) => {
@@ -99,15 +134,15 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                     <div>
                         <h2 className="text-xl font-bold text-gray-100">GCS Memory Store</h2>
                         <div className="flex items-center gap-2 mt-1">
-                             <span className="text-xs text-gray-500 font-mono">bucket: vee-memory</span>
-                             <span className="text-xs text-cyan-400 bg-cyan-900/30 px-2 py-0.5 rounded border border-cyan-800">prefix: {activeWorkspace}/</span>
+                            <span className="text-xs text-gray-500 font-mono">bucket: vee-memory</span>
+                            <span className="text-xs text-cyan-400 bg-cyan-900/30 px-2 py-0.5 rounded border border-cyan-800">prefix: {activeWorkspace}/</span>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white transition-colors" aria-label="Close archive">
                         <XMarkIcon className="w-6 h-6" />
                     </button>
                 </header>
-                
+
                 <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
                     <div className="relative">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -125,23 +160,23 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
 
                 <main className="flex-1 p-4 overflow-y-auto">
                     {filteredFiles.length > 0 ? (
-                         <ul role="list" className="divide-y divide-gray-700/80">
+                        <ul role="list" className="divide-y divide-gray-700/80">
                             {filteredFiles.map((file) => (
                                 <li key={file.id || file.gcsPath} className="flex items-center justify-between gap-x-6 py-3 group">
                                     <div className="flex min-w-0 gap-x-4 items-center flex-1">
                                         {/* Thumbnail Preview Logic */}
                                         {file.metadata.contentType.startsWith('image/') && file.content ? (
                                             <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden border border-gray-600 bg-gray-800 relative">
-                                                <img 
-                                                    src={file.content} 
-                                                    alt={file.name} 
-                                                    className="h-full w-full object-cover" 
+                                                <img
+                                                    src={file.content}
+                                                    alt={file.name}
+                                                    className="h-full w-full object-cover"
                                                 />
                                             </div>
                                         ) : (
                                             <FileIcon className="h-10 w-10 flex-shrink-0 text-gray-400 p-1 bg-gray-800 rounded border border-gray-700/50" />
                                         )}
-                                        
+
                                         {editingFile?.id === file.id ? (
                                             <input
                                                 ref={editInputRef}
@@ -156,14 +191,14 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                                             <div className="min-w-0 flex-auto">
                                                 <p className="text-sm font-semibold leading-6 text-gray-100">{file.name}</p>
                                                 <div className="flex items-center gap-2 mt-1">
-                                                     <p className="truncate text-xs leading-5 text-gray-400">
+                                                    <p className="truncate text-xs leading-5 text-gray-400">
                                                         {formatBytes(file.size)} • {new Date(file.updated).toLocaleDateString()}
                                                     </p>
                                                     <span className="text-[10px] bg-gray-800 text-gray-500 px-1.5 rounded border border-gray-700">
                                                         {file.metadata.type}
                                                     </span>
                                                 </div>
-                                               
+
                                             </div>
                                         )}
                                     </div>
@@ -175,14 +210,34 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                                             </>
                                         ) : (
                                             <>
-                                                <button 
+                                                {/* Copy Button (Text only) */}
+                                                {file.content && !file.content.startsWith('data:') && (
+                                                    <button
+                                                        onClick={() => handleCopy(file.content!)}
+                                                        className="p-2 rounded-full text-gray-500 hover:text-indigo-400 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        title="Copy Content"
+                                                    >
+                                                        <CopyIcon className="h-5 w-5" />
+                                                    </button>
+                                                )}
+
+                                                {/* Download Button */}
+                                                <button
+                                                    onClick={() => handleDownload(file)}
+                                                    className="p-2 rounded-full text-gray-500 hover:text-green-400 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    title="Download"
+                                                >
+                                                    <DownloadIcon className="h-5 w-5" />
+                                                </button>
+
+                                                <button
                                                     onClick={() => setEditingFile({ id: file.id, name: file.name })}
                                                     className="p-2 rounded-full text-gray-500 hover:text-cyan-400 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity"
                                                     aria-label={`Edit ${file.name}`}
                                                 >
                                                     <EditIcon className="h-5 w-5" />
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => onDelete(file.gcsPath)}
                                                     className="p-2 rounded-full text-gray-500 hover:text-red-500 hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 transition-opacity"
                                                     aria-label={`Delete ${file.name}`}
@@ -201,24 +256,24 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                         </div>
                     )}
                 </main>
-                
+
                 <footer className="p-4 border-t border-gray-700/50 flex-shrink-0 bg-gray-800/30">
-                     <input 
-                        type="file" 
-                        multiple 
-                        ref={fileInputRef} 
-                        onChange={handleFileChange} 
+                    <input
+                        type="file"
+                        multiple
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
                         className="hidden"
                     />
                     <button
                         onClick={() => fileInputRef.current?.click()}
                         className="w-full flex items-center justify-center px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors shadow-lg"
                     >
-                       <UploadIcon className="w-5 h-5 mr-2" /> Upload to {activeWorkspace}
+                        <UploadIcon className="w-5 h-5 mr-2" /> Upload to {activeWorkspace}
                     </button>
                 </footer>
             </div>
-        </div>
+        </div >
     );
 };
 

@@ -1,83 +1,60 @@
-
 import { Connection, GithubRepo } from './authService';
 
 /**
  * =================================================================
- * VEE BACKEND SERVICE — SIMULATION
+ * VEE BACKEND SERVICE — PRODUCTION
  * =================================================================
- * This service simulates the VEE backend server. In a real application,
- * the functions here would be API endpoints that the frontend calls via HTTP.
+ * This service communicates with the real VEE backend.
  */
-
-const MOCK_USERNAMES = {
-    google: 'ewingjoshua.v3prototype@gmail.com',
-    github: 'ewingjoshua.v3prototype@gmail.com', // Assuming this email maps to your GitHub for the prototype
-    vercel: 'ewingjoshua.v3prototype@gmail.com',
-};
-
-// Simulate a database of tokens, which would be managed by the backend.
-const tokenDatabase: Partial<Record<'google' | 'github' | 'vercel', Connection>> = {};
 
 export const backendService = {
     /**
-     * Simulates the backend generating an authorization URL.
+     * Gets the authorization URL from the backend.
+     * Use flow=connect to indicate we want to link an account (popup), not just login.
      * @param service The service to connect to.
      */
     async getAuthUrl(service: 'google' | 'github' | 'vercel'): Promise<{ authorizationUrl: string }> {
-        console.log(`[Backend Sim]: Generating auth URL for ${service}...`);
-        // In a real backend, this would construct the real OAuth URL.
-        // The URL would point back to our backend's callback endpoint.
-        // This script sends a message back to the parent window to complete the flow.
-        const callbackUrl = `javascript:
-            window.opener.postMessage({ 
-                type: 'auth-callback', 
-                service: '${service}', 
-                code: 'mock_auth_code_${crypto.randomUUID()}' 
-            }, '*');
-            // A brief delay to ensure the message is sent before closing.
-            setTimeout(() => window.close(), 100);`;
-            
-        return Promise.resolve({ authorizationUrl: callbackUrl });
+        // The backend routes are /auth/google, /auth/github.
+        // We append ?flow=connect so the backend knows to handle the callback as a popup message.
+        const authorizationUrl = `/auth/${service}?flow=connect`;
+        return Promise.resolve({ authorizationUrl });
     },
 
     /**
-     * Simulates the backend's OAuth callback handler.
+     * Handles the successful auth callback.
+     * Since the backend now handles the token exchange and storage during the callback request,
+     * the frontend just needs to acknowledge the success message.
+     * 
      * @param service The service that called back.
-     * @param code The authorization code from the provider.
+     * @param code In the new flow, 'code' might just be a success flag or message.
      */
     async handleAuthCallback(service: 'google' | 'github' | 'vercel', code: string): Promise<Connection> {
-        console.log(`[Backend Sim]: Handling callback for ${service} with code: ${code}`);
-        // A real backend would exchange the code for an access token here.
-        // It would then encrypt and store the token.
+        console.log(`[Backend Service]: Processing callback for ${service}`);
+
+        // In the real flow, the backend has already stored the token and linked the user.
+        // We can just return a success object. Ideally, we would fetch the updated connection status.
+
+        // Construct a connection object based on the success.
+        // In a more robust app, we'd fetch this from an endpoint like /api/connections
         const newConnection: Connection = {
             service,
-            username: MOCK_USERNAMES[service],
-            // This represents a secure session token issued by our backend.
-            token: `mock_session_token_${service}_${crypto.randomUUID()}`, 
+            username: 'Linked Account', // We could fetch the specific username from an API if needed.
+            token: 'stored_securely_on_backend',
             connectedAt: new Date().toISOString(),
         };
-        
-        tokenDatabase[service] = newConnection;
-        console.log(`[Backend Sim]: Stored connection for ${service}.`);
+
         return Promise.resolve(newConnection);
     },
 
     /**
-     * Simulates the backend fetching GitHub repos via its proxy.
+     * Fetches GitHub repos via the backend proxy.
      */
     async getGithubRepos(): Promise<GithubRepo[]> {
-        console.log('[Backend Sim]: Request to fetch GitHub repos received.');
-        if (!tokenDatabase.github) {
-            throw new Error("GitHub account is not connected.");
+        const response = await fetch('/api/integrations/github/repos');
+        if (!response.ok) {
+            throw new Error('Failed to fetch repos from backend');
         }
-        // In a real backend, this would call the `apiProxyService` which uses the stored token.
-        await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
-        return [
-            { name: 'v3-app', url: `https://github.com/JoshEwing-V3/v3-app` },
-            { name: 'mobx-token-contracts', url: `https://github.com/JoshEwing-V3/mobx-token-contracts` },
-            { name: 'architect-revelations-site', url: `https://github.com/JoshEwing-V3/architect-revelations-site` },
-            { name: 'vee-ai-assistant', url: `https://github.com/JoshEwing-V3/vee-ai-assistant` },
-            { name: 'biofield-protocol-research', url: `https://github.com/JoshEwing-V3/biofield-protocol-research` },
-        ];
+        const repos = await response.json();
+        return repos;
     },
 };

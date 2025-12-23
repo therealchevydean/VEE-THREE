@@ -1,16 +1,17 @@
 import React from 'react';
 
 interface HeaderProps {
-  isAudioEnabled: boolean;
-  onToggleAudio: () => void;
-  isScreenSharing: boolean;
-  activeWorkspace: string;
+    isAudioEnabled: boolean;
+    onToggleAudio: () => void;
+    isScreenSharing: boolean;
+    activeWorkspace: string;
+    user: any; // Using any to avoid circular dependency
 }
 
 // --- SVG Icon Components ---
 const VeeIcon = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-cyan-400">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5V15c0-.55.45-1 1-1s1 .45 1 1v1.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5V15h-1v1.5c0 .83-.67 1.5-1.5 1.5S9 17.33 9 16.5v-3c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V15h-1v-1.5c0-.28.22-.5.5-.5s.5.22.5.5V15c0 .55-.45 1-1 1s-1-.45-1-1v-1.5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v3c0 1.38-1.12 2.5-2.5 2.5S11 17.88 11 16.5z"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5V15c0-.55.45-1 1-1s1 .45 1 1v1.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5V15h-1v1.5c0 .83-.67 1.5-1.5 1.5S9 17.33 9 16.5v-3c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V15h-1v-1.5c0-.28.22-.5.5-.5s.5.22.5.5V15c0 .55-.45 1-1 1s-1-.45-1-1v-1.5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v3c0 1.38-1.12 2.5-2.5 2.5S11 17.88 11 16.5z" />
     </svg>
 );
 const SpeakerOnIcon = ({ className }: { className?: string }) => (
@@ -43,7 +44,7 @@ const getWorkspaceName = (id: string) => {
 }
 
 
-const Header: React.FC<HeaderProps> = ({ isAudioEnabled, onToggleAudio, isScreenSharing, activeWorkspace }) => {
+const Header: React.FC<HeaderProps> = ({ isAudioEnabled, onToggleAudio, isScreenSharing, activeWorkspace, user }) => {
     return (
         <header className="p-4 bg-gray-900/60 backdrop-blur-md border-b border-gray-700/50 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center space-x-4">

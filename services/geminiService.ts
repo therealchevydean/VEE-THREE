@@ -178,7 +178,7 @@ const generateInstagramCaption: FunctionDeclaration = {
         properties: {
             imageDescription: { type: Type.STRING },
             tone: { type: Type.STRING },
-            hashtags: { type: Type.ARRAY, items: { type: Type.STRING }},
+            hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
         required: ['imageDescription'],
     },
@@ -217,7 +217,7 @@ const draftSocialPost: FunctionDeclaration = {
             platform: { type: Type.STRING },
             content: { type: Type.STRING },
             visualDescription: { type: Type.STRING },
-            hashtags: { type: Type.ARRAY, items: { type: Type.STRING }},
+            hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
         required: ['platform', 'content'],
     },
@@ -231,7 +231,7 @@ const generateContentCalendar: FunctionDeclaration = {
             topic: { type: Type.STRING },
             startDate: { type: Type.STRING },
             durationDays: { type: Type.NUMBER },
-            platforms: { type: Type.ARRAY, items: { type: Type.STRING }},
+            platforms: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
         required: ['topic', 'startDate', 'durationDays', 'platforms'],
     },
@@ -256,7 +256,7 @@ const createEngagementStrategy: FunctionDeclaration = {
         properties: {
             goal: { type: Type.STRING },
             targetAudience: { type: Type.STRING },
-            platforms: { type: Type.ARRAY, items: { type: Type.STRING }},
+            platforms: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
         required: ['goal', 'targetAudience', 'platforms'],
     },
@@ -324,7 +324,7 @@ const draftProductListing: FunctionDeclaration = {
             title: { type: Type.STRING },
             description: { type: Type.STRING },
             price: { type: Type.STRING },
-            tags: { type: Type.ARRAY, items: { type: Type.STRING }},
+            tags: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
         required: ['platform', 'title', 'description', 'price'],
     },
@@ -426,6 +426,17 @@ const searchFiles: FunctionDeclaration = {
     },
 };
 
+const unzipArchive: FunctionDeclaration = {
+    name: 'unzipArchive',
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            gcsPath: { type: Type.STRING },
+        },
+        required: ['gcsPath'],
+    },
+};
+
 /* ────────────────────────────────────────────────
    OPS + TOOLING
    ──────────────────────────────────────────────── */
@@ -487,7 +498,7 @@ const createCalendarEvent: FunctionDeclaration = {
             description: { type: Type.STRING },
             startTime: { type: Type.STRING },
             endTime: { type: Type.STRING },
-            attendees: { type: Type.ARRAY, items: { type: Type.STRING }},
+            attendees: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
         required: ['title', 'startTime', 'endTime'],
     },
@@ -498,11 +509,11 @@ const sendEmail: FunctionDeclaration = {
     parameters: {
         type: Type.OBJECT,
         properties: {
-            to: { type: Type.ARRAY, items: { type: Type.STRING }},
+            to: { type: Type.ARRAY, items: { type: Type.STRING } },
             subject: { type: Type.STRING },
             body: { type: Type.STRING },
-            cc: { type: Type.ARRAY, items: { type: Type.STRING }},
-            bcc: { type: Type.ARRAY, items: { type: Type.STRING }},
+            cc: { type: Type.ARRAY, items: { type: Type.STRING } },
+            bcc: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
         required: ['to', 'subject', 'body'],
     },
@@ -819,6 +830,7 @@ const VEE_TOOLS: FunctionDeclaration[] = [
     readFile,
     writeFile,
     searchFiles,
+    unzipArchive,
 
     executeShellCommand,
     browseWebsite,
