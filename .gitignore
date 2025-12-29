@@ -25,6 +25,9 @@ build
 .env.local
 .env.*
 !.env.example
+service-account.json
+*.key
+*.pem
 
 # ============================
 # Editors / OS Junk

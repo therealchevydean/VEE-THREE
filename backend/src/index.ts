@@ -20,6 +20,7 @@ import { getPool } from './db';
 import authRoutes from './routes/auth';
 import memoryRoutes from './routes/memory';
 import integrationRoutes from './routes/integrations';
+import gcsRoutes from './routes/gcs';
 import './auth/passport'; // Initialize Passport config
 
 const app = express();
@@ -58,6 +59,7 @@ app.use(passport.session());
 app.use('/auth', authRoutes);
 app.use('/api/memory', memoryRoutes);
 app.use('/api/integrations', integrationRoutes);
+app.use('/api/gcs', gcsRoutes);
 
 // Health Check
 app.get('/api/health', (req: Request, res: Response) => {
