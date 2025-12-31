@@ -1,8 +1,0 @@
---- DIAGNOSTIC START ---
-Expected .env Path: C:\V3\VEE\VEE-THREE\backend\.env
-File Exists?: true
-Successfully parsed .env
-Keys found: VITE_GEMINI_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, DATABASE_URL, GOOGLE_APPLICATION_CREDENTIALS, GCS_BUCKET_NAME
-Raw GOOGLE_APPLICATION_CREDENTIALS value in file: 'service-account.json'
-Process Env Value (Final): 'service-account.json'
---- DIAGNOSTIC END ---

@@ -4,6 +4,7 @@ import ChatInterface from './components/ChatInterface';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import TaskBoard from './components/TaskBoard';
+import EngineView from './src/pages/EngineView';
 import ConnectionsManager from './components/ConnectionsManager';
 import CreativeArchive from './components/CreativeArchive';
 import SettingsPanel from './components/SettingsPanel';
@@ -79,6 +80,7 @@ const VeeApp: React.FC = () => {
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isEbayOpen, setIsEbayOpen] = useState(false);
+  const [isEngineOpen, setIsEngineOpen] = useState(false);
   const [connections, setConnections] = useState<Record<string, Connection | null>>({});
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [archiveFiles, setArchiveFiles] = useState<ArchivedFile[]>([]);
@@ -125,6 +127,7 @@ const VeeApp: React.FC = () => {
   const handleToggleArchive = () => setIsArchiveOpen(prev => !prev);
   const handleToggleSettings = () => setIsSettingsOpen(prev => !prev);
   const handleToggleEbay = () => setIsEbayOpen(prev => !prev);
+  const handleToggleEngine = () => setIsEngineOpen(prev => !prev);
 
   const handleConnect = async (service: 'google' | 'github' | 'vercel') => {
     const newConnection = await connect(service);
@@ -199,6 +202,7 @@ const VeeApp: React.FC = () => {
         onToggleArchive={handleToggleArchive}
         onToggleSettings={handleToggleSettings}
         onToggleEbay={handleToggleEbay}
+        onToggleEngine={handleToggleEngine}
         activeWorkspace={activeWorkspace}
         onSelectWorkspace={setActiveWorkspace}
         user={user}
@@ -261,6 +265,10 @@ const VeeApp: React.FC = () => {
       <EbayDashboard
         isOpen={isEbayOpen}
         onClose={handleToggleEbay}
+      />
+      <EngineView
+        isOpen={isEngineOpen}
+        onClose={handleToggleEngine}
       />
     </div>
   );

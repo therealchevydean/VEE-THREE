@@ -39,6 +39,32 @@ migrate();
 ### 3. Verify
 Use the VEE Search tool (Chat Interface) to ask questions stored in the old memory.
 
+### Execution Engine Database Schema
+
+The following tables were added to `vee_db`:
+
+### `jobs`
+- `id`: UUID (Primary Key)
+- `pipeline_type`: ENUM ('SOCIAL_POST', 'LISTING', 'TOKIN_FRANKS_CARD', 'EBOOK_SECTION')
+- `input_summary`: TEXT
+- `draft_output`: JSONB
+- `status`: ENUM ('INBOX', 'DRAFT', 'READY_FOR_REVIEW', 'APPROVED', 'ARCHIVED')
+- `created_at`, `updated_at`: TIMESTAMP
+
+### `real_world_tasks`
+- `id`: UUID (Primary Key)
+- `related_job_id`: UUID (FK to jobs)
+- `description`: TEXT
+- `category`: ENUM ('PACKAGING', 'SHIPPING', 'BURN_CYCLE', 'PREP', 'REMINDER')
+- `status`: ENUM ('TODO', 'IN_PROGRESS', 'DONE')
+
+## Running Migrations
+
+Execute the engine migration script:
+```bash
+npm run test:engine  # This initializes schema if missing or run scripts/init-engine-db.ts
+```
+
 ## Archive Migration
 Files in the Archive currently reside in `localStorage` (base64).
 You may want to upload these to a real GCS bucket or store them in the Database `inventory`.

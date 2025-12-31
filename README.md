@@ -25,6 +25,17 @@ VEE-THREE is a full-stack application:
 *   **Frontend**: React + Vite + TailwindCSS. Handles the UI, Chat Interface, and simulated "Creative Archive".
 *   **Backend**: Node.js + Express + TypeScript + PostgreSQL. Handles Authentication, API proxying, and Vector Memory.
 *   **AI Engine**: Powered by Google Gemini.
+*   **Execution Engine**: Multi-pipeline content generation (Social, Listing, Ebook) with real-world task integration.
+*   **Creative Archive**: GCS-backed object storage for assets and memory.
+*   **V3 Brand Voice**: Structured AI prompts with strict JSON output schemas.
+
+### Execution Engine API Endpoints
+- `GET /api/jobs`: List all generation jobs.
+- `POST /api/jobs/create`: Create a new pipeline job.
+- `POST /api/jobs/generate/:id`: Trigger AI draft generation.
+- `POST /api/jobs/approve/:id`: Approve draft (triggers real-world tasks).
+- `GET /api/tasks`: List active real-world tasks.
+- `PATCH /api/tasks/:id`: Update task status.
 
 ## Getting Started
 

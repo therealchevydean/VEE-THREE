@@ -33,6 +33,11 @@ const EbayIcon = ({ className }: { className?: string }) => (
         <path d="M4.5 3.75a3 3 0 00-3 3v10.5a3 3 0 003 3h15a3 3 0 003-3V6.75a3 3 0 00-3-3h-15zm4.125 3a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm-3.873 8.703a4.126 4.126 0 017.746 0 .75.75 0 01-.351.92 7.47 7.47 0 01-3.522.877 7.47 7.47 0 01-3.522-.877.75.75 0 01-.351-.92z" />
     </svg>
 );
+const EngineIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clipRule="evenodd" />
+    </svg>
+);
 
 const AppIcon = ({ className }: { className?: string }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}> <path fillRule="evenodd" d="M1.5 6.375c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 17.625V6.375zM6 12a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H6.75a.75.75 0 01-.75-.75V12zm2.25 0a.75.75 0 01.75-.75h3.75a.75.75 0 010 1.5H9a.75.75 0 01-.75-.75z" clipRule="evenodd" /> </svg>);
 const WebsiteIcon = ({ className }: { className?: string }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}> <path d="M12 22a10 10 0 100-20 10 10 0 000 20zm-2-12a1 1 0 11-2 0 1 1 0 012 0zm-4 2a1 1 0 100 2 1 1 0 000-2zm8-5a1 1 0 11-2 0 1 1 0 012 0zm2 3a1 1 0 100 2 1 1 0 000-2zm-5 6a1 1 0 11-2 0 1 1 0 012 0z" /> </svg>);
@@ -47,6 +52,7 @@ const XIcon = ({ className }: { className?: string }) => (<svg xmlns="http://www
 
 const TOOLS = [
     { name: 'Tasks', id: 'tasks', icon: TaskIcon },
+    { name: 'Engine', id: 'engine', icon: EngineIcon },
     { name: 'eBay Ops', id: 'ebay_ops', icon: EbayIcon }, // NEW
     { name: 'Connections', id: 'connections', icon: ConnectIcon },
     { name: 'Archive', id: 'archive', icon: ArchiveIcon },
@@ -75,6 +81,7 @@ interface SidebarProps {
     onToggleArchive: () => void;
     onToggleSettings: () => void;
     onToggleEbay: () => void;
+    onToggleEngine: () => void;
     activeWorkspace: string;
     onSelectWorkspace: (id: string) => void;
     user: any; // Using any to avoid circular dependency for now, strictly should be User type
@@ -86,6 +93,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     onToggleArchive,
     onToggleSettings,
     onToggleEbay,
+    onToggleEngine,
     activeWorkspace,
     onSelectWorkspace,
     user
@@ -97,6 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         if (toolId === 'archive') onToggleArchive();
         if (toolId === 'settings') onToggleSettings();
         if (toolId === 'ebay_ops') onToggleEbay();
+        if (toolId === 'engine') onToggleEngine();
     };
 
     return (
@@ -133,8 +142,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                             key={item.id}
                             onClick={() => onSelectWorkspace(item.id)}
                             className={`flex items-center w-full h-12 px-6 transition-colors relative ${activeWorkspace === item.id
-                                    ? 'text-cyan-400 bg-gray-800/50'
-                                    : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                                ? 'text-cyan-400 bg-gray-800/50'
+                                : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
                                 }`}
                         >
                             {activeWorkspace === item.id && (
