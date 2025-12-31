@@ -1,9 +1,39 @@
 import dotenv from 'dotenv';
 import dns from 'dns';
 
+
 // Load environment variables from root .env if possible, or local .env
 dotenv.config({ path: '../.env' });
 dotenv.config(); // Fallback to local .env
+
+// [DEBUG & FIX] Ensure Google Credentials Path is Absolute
+console.log('[Startup] CWD:', process.cwd());
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    let credsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    if (!path.isAbsolute(credsPath)) {
+        // Resolve relative to project root (../ from src/index.ts location if using ts-node/src)
+        // or just CWD if that's safer. The feedback suggested projectRoot = path.resolve(__dirname, '..');
+        // If we are in backend/src, then .. is backend/.
+        const projectRoot = path.resolve(__dirname, '..');
+        credsPath = path.resolve(projectRoot, credsPath);
+    }
+
+    console.log(`[Startup] GOOGLE_APPLICATION_CREDENTIALS: '${process.env.GOOGLE_APPLICATION_CREDENTIALS}' -> Resolved: '${credsPath}'`);
+
+    if (fs.existsSync(credsPath)) {
+        process.env.GOOGLE_APPLICATION_CREDENTIALS = credsPath;
+        console.log('[Startup] Verified key file exists. Path updated in env.');
+    } else {
+        console.error('[Startup] FATAL: Key file NOT found at', credsPath);
+        // Fail fast in production
+        if (process.env.NODE_ENV === 'production') {
+            process.exit(1);
+        }
+    }
+} else {
+    console.error('[Startup] WARNING: GOOGLE_APPLICATION_CREDENTIALS is NOT set.');
+}
+
 
 // Force IPv4 to avoid IPv6 timeouts with Supabase
 if (dns.setDefaultResultOrder) {
@@ -21,6 +51,9 @@ import authRoutes from './routes/auth';
 import memoryRoutes from './routes/memory';
 import integrationRoutes from './routes/integrations';
 import gcsRoutes from './routes/gcs';
+import jobsRoutes from './routes/jobs';
+import tasksRoutes from './routes/tasks';
+
 import './auth/passport'; // Initialize Passport config
 
 const app = express();
@@ -60,6 +93,9 @@ app.use('/auth', authRoutes);
 app.use('/api/memory', memoryRoutes);
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/gcs', gcsRoutes);
+app.use('/api/jobs', jobsRoutes);
+app.use('/api/tasks', tasksRoutes);
+
 
 // Health Check
 app.get('/api/health', (req: Request, res: Response) => {
