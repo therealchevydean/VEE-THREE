@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 import dns from 'dns';
+import * as path from 'path';
+import * as fs from 'fs';
 
 
 // Load environment variables from root .env if possible, or local .env
