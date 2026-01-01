@@ -60,3 +60,37 @@ CREATE TABLE IF NOT EXISTS inventory (
   metadata JSONB DEFAULT '{}',
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Jobs Table (Execution Pipeline)
+CREATE TABLE IF NOT EXISTS jobs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  pipeline_type VARCHAR(64) NOT NULL,
+  source_asset_id VARCHAR(255),
+  input_summary TEXT NOT NULL,
+  draft_output JSONB,
+  status VARCHAR(64) NOT NULL DEFAULT 'INBOX',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+CREATE INDEX IF NOT EXISTS idx_jobs_pipeline_type ON jobs(pipeline_type);
+CREATE INDEX IF NOT EXISTS idx_jobs_user ON jobs(user_id);
+
+-- Real World Tasks Table
+CREATE TABLE IF NOT EXISTS real_world_tasks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  related_job_id UUID REFERENCES jobs(id) ON DELETE SET NULL,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  description TEXT NOT NULL,
+  category VARCHAR(64) NOT NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'TODO',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_real_world_tasks_status ON real_world_tasks(status);
+CREATE INDEX IF NOT EXISTS idx_real_world_tasks_category ON real_world_tasks(category);
+CREATE INDEX IF NOT EXISTS idx_real_world_tasks_related_job ON real_world_tasks(related_job_id);
+CREATE INDEX IF NOT EXISTS idx_real_world_tasks_user ON real_world_tasks(user_id);
