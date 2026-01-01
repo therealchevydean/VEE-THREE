@@ -1,5 +1,5 @@
-
 import { ArchivedFile, GCSMetadata, GCSFileType } from '../types';
+import JSZip from 'jszip';
 
 const API_BASE = 'http://localhost:3001/api/gcs';
 
@@ -115,7 +115,7 @@ const readFileContent = (file: File): Promise<string | null> => {
 };
 
 /**
- * Simulates a GCS PutObject operation.
+ * Uploads a file via Backend API (to be implemented with signed URLs)
  */
 export const uploadFile = async (file: File, projectId: string): Promise<void> => {
     console.warn("Upload to real GCS not yet implemented via frontend. Please use Console or Implement Signed URLs.");
@@ -123,148 +123,33 @@ export const uploadFile = async (file: File, projectId: string): Promise<void> =
 };
 
 /**
- * Simulates GCS ListObjects (Prefix Scan).
- * Only returns objects belonging to the specific projectId.
+ * Deletes a file via Backend API
  */
-// Replaced by new listFiles above
-
-/**
- * Deletes an object.
- */
-export const deleteFile = (gcsPath: string): void => {
-    const initialLength = gcsBucket.length;
-    gcsBucket = gcsBucket.filter(file => file.gcsPath !== gcsPath);
-    if (gcsBucket.length < initialLength) {
-        saveBucket();
-        console.log(`[GCS Sim]: DeleteObject gs://vee-memory/${gcsPath}`);
-    }
+export const deleteFile = async (gcsPath: string): Promise<void> => {
+    console.warn("Delete via backend API not yet implemented.");
+    // TODO: Implement DELETE /api/gcs/:path endpoint
 };
 
 /**
- * Renames a file (Simulates Copy + Delete).
+ * Renames a file via Backend API
  */
-export const renameFile = (oldPath: string, newName: string): boolean => {
-    const fileIndex = gcsBucket.findIndex(file => file.gcsPath === oldPath);
-    if (fileIndex > -1) {
-        const file = gcsBucket[fileIndex];
-        // Reconstruct path with new filename
-        const pathParts = file.gcsPath.split('/');
-        pathParts[pathParts.length - 1] = newName.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const newPath = pathParts.join('/');
-
-        gcsBucket[fileIndex] = {
-            ...file,
-            gcsPath: newPath,
-            name: newName
-        };
-        saveBucket();
-        return true;
-    }
+export const renameFile = async (oldPath: string, newName: string): Promise<boolean> => {
+    console.warn("Rename via backend API not yet implemented.");
+    // TODO: Implement PATCH /api/gcs/rename endpoint
     return false;
 };
 
 /**
- * Searches across the entire bucket (or scoped to project).
- */
-// Replaced by new searchFiles above
-
-/**
- * NEW: Searches Josh's ChatGPT Memory Archive
- * Simulates reading from gs://v3-architect-archive/ChatGPT_Data/
- */
-/**
  * Search specifically in the Archive Bucket path
  */
 export const searchChatGPTMemory = async (query: string, dateRange?: string, limit: number = 5) => {
-    return searchFiles(query); // Reuse main search for now, relying on GCS prefix if needed or just global search
+    return searchFiles(query);
 };
 
 /**
- * Unzips an archived file and stores contents as new files.
+ * Unzips an archived file - requires backend implementation
  */
-import JSZip from 'jszip';
-
 export const unzipFile = async (gcsPath: string): Promise<string[]> => {
-    const fileIndex = gcsBucket.findIndex(f => f.gcsPath === gcsPath);
-    if (fileIndex === -1) {
-        throw new Error(`File not found: ${gcsPath}`);
-    }
-
-    const file = gcsBucket[fileIndex];
-    if (!file.content) {
-        throw new Error(`File has no content: ${gcsPath}`);
-    }
-
-    // Extract Base64 data
-    const base64Data = file.content.split(',')[1];
-    if (!base64Data) {
-        throw new Error(`Invalid content format for: ${gcsPath}`);
-    }
-
-    try {
-        const zip = new JSZip();
-        const loadedZip = await zip.loadAsync(base64Data, { base64: true });
-        const newFiles: string[] = [];
-        const projectId = file.metadata.projectId;
-
-        // Iterate and save files
-        const promises: Promise<void>[] = [];
-
-        loadedZip.forEach((relativePath, zipEntry) => {
-            if (zipEntry.dir) return; // Skip directories
-
-            const promise = async () => {
-                const contentBlob = await zipEntry.async('blob');
-                // Convert Blob to Base64 Data URL for storage
-                const reader = new FileReader();
-                const base64Content = await new Promise<string>((resolve) => {
-                    reader.onloadend = () => resolve(reader.result as string);
-                    reader.readAsDataURL(contentBlob);
-                });
-
-                // Construct new path: {projectId}/upload/{zipName}/{relativePath}
-                // Sanitize zip name to use as folder
-                const zipFolderName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9.-]/g, '_');
-                const safeRelativePath = relativePath.split('/').map(p => p.replace(/[^a-zA-Z0-9.-]/g, '_')).join('/');
-
-                const newGcsPath = `${projectId}/upload/${zipFolderName}/${safeRelativePath}`;
-
-                const newFile: ArchivedFile = {
-                    id: crypto.randomUUID(),
-                    gcsPath: newGcsPath,
-                    name: zipEntry.name.split('/').pop() || zipEntry.name,
-                    size: (zipEntry as any)._data.uncompressedSize || 0,
-                    updated: new Date().toISOString(),
-                    content: base64Content,
-                    metadata: {
-                        projectId,
-                        type: 'upload',
-                        contentType: 'application/octet-stream', // Generic fallback
-                        originalName: zipEntry.name,
-                        uploadedBy: 'vee_agent',
-                        description: `Extracted from ${file.name}`
-                    }
-                };
-
-                // Upsert
-                const existingIdx = gcsBucket.findIndex(f => f.gcsPath === newGcsPath);
-                if (existingIdx >= 0) {
-                    gcsBucket[existingIdx] = newFile;
-                } else {
-                    gcsBucket.push(newFile);
-                }
-                newFiles.push(newGcsPath);
-            };
-            promises.push(promise());
-        });
-
-        await Promise.all(promises);
-        saveBucket();
-        console.log(`[GCS Sim]: Unzipped ${gcsPath} -> ${newFiles.length} files.`);
-        return newFiles;
-
-    } catch (error) {
-        console.error("Unzip failed:", error);
-        throw new Error(`Failed to unzip file: ${(error as Error).message}`);
-    }
+    throw new Error("Unzip via backend API not yet implemented. This requires server-side processing.");
+    // TODO: Implement POST /api/gcs/unzip endpoint
 };
