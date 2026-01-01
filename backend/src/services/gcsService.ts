@@ -61,3 +61,87 @@ export const getFileMetadata = async (filename: string) => {
     const [metadata] = await storage.bucket(BUCKET_NAME).file(filename).getMetadata();
     return metadata;
 };
+
+/**
+ * Upload a file to GCS
+ */
+export const uploadFile = async (destination: string, content: Buffer | string): Promise<void> => {
+  try {
+    const file = storage.bucket(BUCKET_NAME).file(destination);
+    await file.save(content);
+    console.log(`Uploaded file to ${destination}`);
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a file from GCS
+ */
+export const deleteFile = async (filename: string): Promise<void> => {
+  try {
+    await storage.bucket(BUCKET_NAME).file(filename).delete();
+    console.log(`Deleted file ${filename}`);
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    throw error;
+  }
+};
+
+/**
+ * Copy a file within GCS
+ */
+export const copyFile = async (sourceFile: string, destinationFile: string): Promise<void> => {
+  try {
+    await storage.bucket(BUCKET_NAME).file(sourceFile).copy(storage.bucket(BUCKET_NAME).file(destinationFile));
+    console.log(`Copied ${sourceFile} to ${destinationFile}`);
+  } catch (error) {
+    console.error('Error copying file:', error);
+    throw error;
+  }
+};
+
+/**
+ * Move a file within GCS (copy then delete)
+ */
+export const moveFile = async (sourceFile: string, destinationFile: string): Promise<void> => {
+  try {
+    await copyFile(sourceFile, destinationFile);
+    await deleteFile(sourceFile);
+    console.log(`Moved ${sourceFile} to ${destinationFile}`);
+  } catch (error) {
+    console.error('Error moving file:', error);
+    throw error;
+  }
+};
+
+/**
+ * Create a folder structure in GCS (by creating a marker file)
+ */
+export const createFolder = async (folderPath: string): Promise<void> => {
+  try {
+    // GCS doesn't have folders, but we can create a marker file
+    const markerFile = folderPath.endsWith('/') ? `${folderPath}.keep` : `${folderPath}/.keep`;
+    await uploadFile(markerFile, '');
+    console.log(`Created folder marker at ${folderPath}`);
+  } catch (error) {
+    console.error('Error creating folder:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get bucket statistics
+ */
+export const getBucketStats = async (): Promise<{ totalFiles: number; totalSize: number }> => {
+  try {
+    const [files] = await storage.bucket(BUCKET_NAME).getFiles();
+    const totalFiles = files.length;
+    const totalSize = files.reduce((sum, file) => sum + parseInt(String(file.metadata.size) || '0'), 0);
+    return { totalFiles, totalSize };
+  } catch (error) {
+    console.error('Error getting bucket stats:', error);
+    throw error;
+  }
+};
