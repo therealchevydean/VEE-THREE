@@ -63,4 +63,53 @@ router.get('/file/*', async (req, res) => {
     }
 });
 
+/**
+ * POST /api/gcs/upload
+ * Upload a file to GCS
+ * Body: multipart/form-data with 'file' field and optional 'path' field
+ */
+router.post('/upload', async (req, res) => {
+  try {
+    // TODO: Implement multipart file upload handling (requires multer or busboy)
+    res.status(501).json({ status: 'error', message: 'Upload not yet implemented' });
+  } catch (error) {
+    console.error('API Error Upload File:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to upload file' });
+  }
+});
+
+/**
+ * POST /api/gcs/unzip
+ * Unzip a file in GCS to a target folder
+ * Body: { sourceFile: string, targetFolder: string }
+ */
+router.post('/unzip', async (req, res) => {
+  try {
+    // TODO: Implement unzip functionality (download zip, extract, upload files)
+    res.status(501).json({ status: 'error', message: 'Unzip not yet implemented' });
+  } catch (error) {
+    console.error('API Error Unzip File:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to unzip file' });
+  }
+});
+
+/**
+ * POST /api/gcs/organize-chatgpt
+ * Organize ChatGPT exported data structure
+ * Body: { sourceFolder: string }
+ */
+router.post('/organize-chatgpt', async (req, res) => {
+  try {
+    const { sourceFolder } = req.body;
+    if (!sourceFolder) {
+      return res.status(400).json({ status: 'error', message: 'sourceFolder required' });
+    }
+    // TODO: Implement ChatGPT data organization
+    res.status(501).json({ status: 'error', message: 'Organize ChatGPT not yet implemented' });
+  } catch (error) {
+    console.error('API Error Organize ChatGPT:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to organize ChatGPT data' });
+  }
+});
+
 export default router;
