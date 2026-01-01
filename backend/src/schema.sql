@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   github_id VARCHAR(255) UNIQUE,
   display_name VARCHAR(255),
   avatar_url TEXT,
-  tokens JSONB DEFAULT '{}', -- Encrypted tokens for 3rd party services
+  tokens JSONB DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS tasks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
-  status VARCHAR(50) DEFAULT 'pending', -- pending, in_progress, completed
-  embedding vector(768), -- Dimension depends on embedding model (e.g., Gemini is 768)
+  status VARCHAR(50) DEFAULT 'pending',
+  embedding vector(768),
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS memory (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
-  type VARCHAR(50) DEFAULT 'general', -- chat_log, creative_idea, fact, rule
+  type VARCHAR(50) DEFAULT 'general',
   embedding vector(768),
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS inventory (
   price DECIMAL(10, 2),
   quantity INTEGER DEFAULT 0,
   platform VARCHAR(50) DEFAULT 'ebay',
-  external_id VARCHAR(255), -- eBay Item ID
+  external_id VARCHAR(255),
   metadata JSONB DEFAULT '{}',
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -94,3 +94,23 @@ CREATE INDEX IF NOT EXISTS idx_real_world_tasks_status ON real_world_tasks(statu
 CREATE INDEX IF NOT EXISTS idx_real_world_tasks_category ON real_world_tasks(category);
 CREATE INDEX IF NOT EXISTS idx_real_world_tasks_related_job ON real_world_tasks(related_job_id);
 CREATE INDEX IF NOT EXISTS idx_real_world_tasks_user ON real_world_tasks(user_id);
+
+-- Inventory Items Table (Extracted from conversations)
+CREATE TABLE IF NOT EXISTS inventory_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  category VARCHAR(64) NOT NULL,
+  quantity NUMERIC,
+  unit VARCHAR(32),
+  location TEXT,
+  notes TEXT,
+  source_path TEXT NOT NULL,
+  source_timestamp TIMESTAMP WITH TIME ZONE,
+  confidence NUMERIC DEFAULT 0.8,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_inventory_category ON inventory_items(category);
+CREATE INDEX IF NOT EXISTS idx_inventory_name ON inventory_items USING gin (to_tsvector('english', name));
+CREATE INDEX IF NOT EXISTS idx_inventory_source ON inventory_items(source_path);
