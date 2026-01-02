@@ -111,8 +111,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 
 // Serve static files from /public (frontend build)
-const publicPath = path.resolve(__dirname, '..', 'public');
-app.use(express.static(publicPath));
+const publicPath = path.resolve(__dirname, '..', '..', 'public');app.use(express.static(publicPath));
 
 // Catch-all route to serve index.html for client-side routing
 app.get('*', (req: Request, res: Response) => {
