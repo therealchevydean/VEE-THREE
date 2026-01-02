@@ -29,23 +29,14 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install serve for frontend static files
-RUN npm install -g serve
-
-# Copy built frontend
-COPY --from=frontend-builder /app/dist /app/frontend/dist
+# Copy built frontend to public directory (backend will serve it)
+COPY --from=frontend-builder /app/dist /app/public
 
 # Copy backend with dependencies
 COPY --from=backend-builder /app/backend /app/backend
 
-# Create startup script
-RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'serve -s /app/frontend/dist -l 8080 &' >> /app/start.sh && \
-    echo 'cd /app/backend && npm start' >> /app/start.sh && \
-    chmod +x /app/start.sh
-
 # Expose port
 EXPOSE 8080
 
-# Start both services
-CMD ["/app/start.sh"]
+# Start backend only (it serves both API and frontend)
+CMD ["sh", "-c", "cd /app/backend && npm start"]
