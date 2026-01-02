@@ -121,6 +121,5 @@ app.get('*', (req: Request, res: Response) => {
     res.status(404).json({ error: 'Not found' });
   }
 });
-app.listen(PORT, () => {
-    console.log(`[Backend] Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[Backend] Server running on http://0.0.0.0:${PORT}`);});
