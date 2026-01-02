@@ -23,6 +23,7 @@ RUN npm install
 
 # COPY backend source
 COPY backend ./
+RUN npm run build
 
 # Stage 3: Production runtime
 FROM node:20-alpine
