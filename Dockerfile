@@ -17,12 +17,12 @@ FROM node:20-alpine AS backend-builder
 
 WORKDIR /app/backend
 
-# COPY packages/backend package files
-COPY packages/backend/package*.json ./
+# COPY backend package files
+COPY backend/package*.json ./
 RUN npm install
 
-# COPY packages/backend source
-COPY packages/backend ./
+# COPY backend source
+COPY backend ./
 
 # Stage 3: Production runtime
 FROM node:20-alpine
@@ -32,7 +32,7 @@ WORKDIR /app
 # Copy built frontend to public directory (backend will serve it)
 COPY --from=frontend-builder /app/dist /app/public
 
-# COPY packages/backend with dependencies
+# COPY backend with dependencies
 COPY --from=backend-builder /app/backend /app/backend
 
 # Expose port
