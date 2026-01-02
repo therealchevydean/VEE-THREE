@@ -1,41 +1,51 @@
-# Multi-stage build for VEE (Virtual Ecosystem Engineer)
-# Stage 1: Build the application
-FROM node:20-alpine AS builder
+# Multi-stage build for VEE (Virtual Ecosystem Engineer) with Backend
+# Stage 1: Build the frontend
+FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy root package files
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy source code
+# Copy source and build frontend
 COPY . .
-
-# Build the application
 RUN npm run build
 
-# Stage 2: Production image with nginx
-FROM nginx:alpine
+# Stage 2: Build backend
+FROM node:20-alpine AS backend-builder
 
-# Copy built assets from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+WORKDIR /app/backend
 
-# Create nginx config file for Cloud Run
-RUN echo 'server {' > /etc/nginx/conf.d/default.conf && \
-    echo '    listen 8080;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    server_name _;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    root /usr/share/nginx/html;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    index index.html;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    location / {' >> /etc/nginx/conf.d/default.conf && \
-    echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/conf.d/default.conf && \
-    echo '    }' >> /etc/nginx/conf.d/default.conf && \
-    echo '}' >> /etc/nginx/conf.d/default.conf && \
-    sed -i 's/listen\s*80;/listen 8080;/' /etc/nginx/nginx.conf
+# Copy backend package files
+COPY backend/package*.json ./
+RUN npm install
 
-# Expose port 8080 (Cloud Run default)
+# Copy backend source
+COPY backend ./
+
+# Stage 3: Production runtime
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install serve for frontend static files
+RUN npm install -g serve
+
+# Copy built frontend
+COPY --from=frontend-builder /app/dist /app/frontend/dist
+
+# Copy backend with dependencies
+COPY --from=backend-builder /app/backend /app/backend
+
+# Create startup script
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'serve -s /app/frontend/dist -l 8080 &' >> /app/start.sh && \
+    echo 'cd /app/backend && npm start' >> /app/start.sh && \
+    chmod +x /app/start.sh
+
+# Expose port
 EXPOSE 8080
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start both services
+CMD ["/app/start.sh"]
