@@ -60,7 +60,7 @@ interface CreativeArchiveProps {
     files: ArchivedFile[];
     onUpload: (files: File[]) => void;
     onDelete: (id: string) => void;
-    onRename: (id: string, newName: string) => void;
+    onRename: (id: string, newName: string) => Promise<boolean>;
     activeWorkspace: string;
 }
 
@@ -83,9 +83,13 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
         }
     };
 
-    const handleRename = () => {
+    const handleRename = async () => {
         if (editingFile && editingFile.name.trim()) {
-            onRename(editingFile.id, editingFile.name.trim());
+            try {
+                await onRename(editingFile.id, editingFile.name.trim());
+            } catch (err) {
+                console.error("Rename failed:", err);
+            }
         }
         setEditingFile(null);
     };
@@ -179,6 +183,7 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
 
                                         {editingFile?.id === file.id ? (
                                             <input
+                                                title="Edit file name"
                                                 ref={editInputRef}
                                                 type="text"
                                                 value={editingFile.name}
@@ -260,6 +265,7 @@ const CreativeArchive: React.FC<CreativeArchiveProps> = ({ isOpen, onClose, file
                 <footer className="p-4 border-t border-gray-700/50 flex-shrink-0 bg-gray-800/30">
                     <input
                         type="file"
+                        title="Upload to archive"
                         multiple
                         ref={fileInputRef}
                         onChange={handleFileChange}

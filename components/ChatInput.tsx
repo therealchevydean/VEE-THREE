@@ -229,6 +229,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, isScree
       <div className="flex items-end gap-2 p-2">
         <input
           type="file"
+          title="Upload files"
           multiple
           ref={fileInputRef}
           onChange={handleFileChange}
@@ -258,8 +259,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, isScree
           onClick={onToggleScreenShare}
           disabled={isLoading}
           className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 flex-shrink-0 ${isScreenSharing
-              ? 'bg-red-600 text-white animate-pulse'
-              : 'text-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed hover:text-indigo-400'
+            ? 'bg-red-600 text-white animate-pulse'
+            : 'text-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed hover:text-indigo-400'
             }`}
           aria-label={isScreenSharing ? 'Stop sharing screen' : 'Share screen'}
         >
@@ -270,8 +271,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading, isScree
             onClick={handleToggleRecording}
             disabled={isLoading}
             className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 flex-shrink-0 ${isRecording
-                ? 'bg-red-600 text-white animate-pulse'
-                : 'text-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed hover:text-indigo-400'
+              ? 'bg-red-600 text-white animate-pulse'
+              : 'text-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed hover:text-indigo-400'
               }`}
             aria-label={isRecording ? 'Stop recording' : 'Start recording'}
           >

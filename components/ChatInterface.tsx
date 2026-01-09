@@ -26,7 +26,7 @@ interface ChatInterfaceProps {
     isScreenSharing: boolean;
     onSetIsScreenSharing: (isSharing: boolean) => void;
     connections: Record<string, Connection | null>;
-    onRenameArchiveFile: (id: string, newName: string) => boolean;
+    onRenameArchiveFile: (id: string, newName: string) => Promise<boolean>;
     onUploadToArchive: (files: File[]) => void;
     activeWorkspace: string;
 }
@@ -459,7 +459,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
             case 'searchChatGPTMemory': // NEW TOOL
                 return await creativeArchiveService.searchChatGPTMemory(args.query, args.dateRange, args.limit);
             case 'renameArchivedFile': {
-                const success = onRenameArchiveFile(args.fileId, args.newName);
+                const success = await onRenameArchiveFile(args.fileId, args.newName);
                 if (success) {
                     return { status: 'success', message: `File successfully renamed to "${args.newName}".` };
                 } else {
@@ -704,7 +704,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
 
     const handleToolCalls = async (functionCalls: FunctionCall[]) => {
         const agentCall = functionCalls.find(fc => fc.name === 'executeAgentPlan');
-        if (agentCall && agentCall.args.plan) {
+        if (agentCall && agentCall.args && agentCall.args.plan) {
             const { goal, plan: planSteps } = agentCall.args as { goal: string, plan: { name: string, args: any }[] };
             const newPlan: AgentPlan = {
                 goal: goal,
@@ -737,6 +737,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
 
         const toolResponseParts = [];
         for (const fc of functionCalls) {
+            if (!fc.name) continue;
             const result = await executeTool(fc.name, fc.args);
             toolResponseParts.push({
                 functionResponse: {
@@ -1029,18 +1030,24 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isAudioEnabled, onAddTask
 
             const messagePayload = [{ text: processedUserInput }, ...generativeParts];
 
+            if (!chatSessionRef.current) {
+                throw new Error("Neural link not established.");
+            }
             let response = await chatSessionRef.current.sendMessage({ message: messagePayload });
 
             if (response.functionCalls && response.functionCalls.length > 0) {
                 const toolResponseParts = await handleToolCalls(response.functionCalls);
                 if (toolResponseParts) {
+                    if (!chatSessionRef.current) {
+                        throw new Error("Neural link lost.");
+                    }
                     response = await chatSessionRef.current.sendMessage({ message: toolResponseParts });
                 } else {
                     return;
                 }
             }
 
-            const modelMessage: Message = { role: Role.MODEL, content: response.text };
+            const modelMessage: Message = { role: Role.MODEL, content: response.text || '' };
             setMessages((prev) => [...prev.slice(0, -1), modelMessage]);
 
             if (isAudioEnabledRef.current && response.text) {

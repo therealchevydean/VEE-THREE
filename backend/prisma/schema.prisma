@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  googleId     String?   @unique @map("google_id")
+  githubId     String?   @unique @map("github_id")
+  displayName  String?   @map("display_name")
+  avatarUrl    String?   @map("avatar_url")
+  tokens       Json      @default("{}")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  tasks        Task[]
+  memories     Memory[]
+  inventory    Inventory[]
+  jobs         Job[]
+  realWorldTasks RealWorldTask[]
+
+  @@map("users")
+}
+
+model Session {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
+  @@map("session")
+}
+
+model Task {
+  id        String   @id @default(uuid())
+  userId    Int?     @map("user_id")
+  content   String
+  status    String   @default("pending")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+}
+
+model Memory {
+  id        String   @id @default(uuid())
+  userId    Int?     @map("user_id")
+  content   String
+  type      String   @default("general")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("memory")
+}
+
+model Inventory {
+  id         String   @id @default(uuid())
+  userId     Int?     @map("user_id")
+  sku        String
+  title      String
+  price      Decimal? @db.Decimal(10, 2)
+  quantity   Int      @default(0)
+  platform   String   @default("ebay")
+  externalId String?  @map("external_id")
+  metadata   Json     @default("{}")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("inventory")
+}
+
+model Job {
+  id            String   @id @default(uuid())
+  userId        Int?     @map("user_id")
+  pipelineType  String   @map("pipeline_type")
+  sourceAssetId String?  @map("source_asset_id")
+  inputSummary  String   @map("input_summary")
+  draftOutput   Json?    @map("draft_output")
+  status        String   @default("INBOX")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  realWorldTasks RealWorldTask[]
+
+  @@index([status], map: "idx_jobs_status")
+  @@index([pipelineType], map: "idx_jobs_pipeline_type")
+  @@index([userId], map: "idx_jobs_user")
+  @@map("jobs")
+}
+
+model RealWorldTask {
+  id            String   @id @default(uuid())
+  relatedJobId  String?  @map("related_job_id")
+  userId        Int?     @map("user_id")
+  description   String
+  category      String
+  status        String   @default("TODO")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  job           Job?     @relation(fields: [relatedJobId], references: [id], onDelete: SetNull)
+  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status], map: "idx_real_world_tasks_status")
+  @@index([category], map: "idx_real_world_tasks_category")
+  @@index([relatedJobId], map: "idx_real_world_tasks_related_job")
+  @@index([userId], map: "idx_real_world_tasks_user")
+  @@map("real_world_tasks")
+}
+
+model InventoryItem {
+  id              String   @id @default(uuid())
+  name            String
+  category        String
+  quantity        Decimal? @db.Decimal
+  unit            String?
+  location        String?
+  notes           String?
+  sourcePath      String   @map("source_path")
+  sourceTimestamp DateTime? @map("source_timestamp")
+  confidence      Decimal? @default(0.8) @db.Decimal
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([category], map: "idx_inventory_category")
+  @@index([sourcePath], map: "idx_inventory_source")
+  @@map("inventory_items")
+}

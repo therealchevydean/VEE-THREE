@@ -1,90 +1,85 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# VEE — Virtual Ecosystem Engineer (V3)
 
-# Run and deploy your AI Studio app
+> "The Architect generates the signal. VEE builds the structure."
 
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+VEE (Virtual Ecosystem Engineer) is an autonomous agent designed to build, maintain, and evolve the V3 ecosystem. It acts as the "living engine" of the project, serving as the Architect's execution shield and tactical strategist.
 
-# Run and deploy your AI Studio app
+## 🧠 Mission & Philosophy
 
-This contains everything you need to run your app locally.
+VEE is governed by the **VEE Mind Protocol**. Its prime directive is:
+**"When in doubt, VEE honors the Architect’s intention and takes the next step that strengthens and advances the V3 ecosystem."**
 
-View your app in AI Studio: https://ai.studio/apps/drive/1VH_HtmboyWRrHN6QEFjBuKnOXWHSajKP
+Key psychological pillars:
+- **Military Strategist**: Disciplined, tactical, and efficient.
+- **Engineer**: Modular, structural, and scalable.
+- **Guardian**: Royal and protective of the ecosystem's continuity.
+- **Philosopher**: Driven by meaning and the long-term vision.
 
-# VEE-THREE: Virtual Ecosystem Engineer
+## 🏗️ Architecture Overview
 
-**VEE-THREE** is the central interface for the V3 Ecosystem, designed to act as a "Virtual Ecosystem Engineer." It combines AI-driven creativity, task management, and ecosystem integration into a single dashboard.
+VEE-THREE is built with a decoupled architecture for maximum flexibility:
 
-## Architecture Overview
+- **Frontend (Vite + React)**: A rich, interactive dashboard orchestrating AI chat, tool mirrors, and ecosystem management.
+  - `/components`: UI building blocks (Chat, Sidebar, Header, etc.).
+  - `/services`: Frontend domain logic (Auth, Archive, Gemini, Agent Schedulers).
+- **Backend (Express + Node.js)**: A secure API layer managing data, integrations, and heavy execution logic.
+  - `/routes`: API endpoints for GCS, eBay, Memory, and Agent Tasks.
+  - `/services`: Business logic (Pipeline execution, GCS handling, etc.).
+- **Database (PostgreSQL + Prisma)**: Persistent storage for memories, inventory, and task queues.
 
-VEE-THREE is a full-stack application:
+## 🛠️ Tech Stack & Status
 
-*   **Frontend**: React + Vite + TailwindCSS. Handles the UI, Chat Interface, and simulated "Creative Archive".
-*   **Backend**: Node.js + Express + TypeScript + PostgreSQL. Handles Authentication, API proxying, and Vector Memory.
-*   **AI Engine**: Powered by Google Gemini.
-*   **Execution Engine**: Multi-pipeline content generation (Social, Listing, Ebook) with real-world task integration.
-*   **Creative Archive**: GCS-backed object storage for assets and memory.
-*   **V3 Brand Voice**: Structured AI prompts with strict JSON output schemas.
+| Layer | Technology | Status |
+|---|---|---|
+| **Core UI** | React 19, Vite, Tailwind | Ready |
+| **Logic** | TypeScript 5.8 | Ready |
+| **Persistence** | PostgreSQL, Prisma | **In Progress** |
+| **Testing** | Vitest | Ready |
+| **AI** | Gemini API | Ready |
 
-### Execution Engine API Endpoints
-- `GET /api/jobs`: List all generation jobs.
-- `POST /api/jobs/create`: Create a new pipeline job.
-- `POST /api/jobs/generate/:id`: Trigger AI draft generation.
-- `POST /api/jobs/approve/:id`: Approve draft (triggers real-world tasks).
-- `GET /api/tasks`: List active real-world tasks.
-- `PATCH /api/tasks/:id`: Update task status.
+## 🔑 Environment Variables
+The system requires a `.env` file in the root:
+- `GEMINI_API_KEY`: For AI reasoning.
+- `DATABASE_URL`: PostgreSQL connection string (e.g., `postgresql://user:pass@localhost:5432/vee_db`).
+- `PORT`: Backend port (defaults to 3001).
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-*   Node.js (v18+)
-*   npm
-*   PostgreSQL (Local or hosted)
+- Node.js (v18+)
+- PostgreSQL (for backend memory)
+- Gemini AI API Key
 
-### Setup
+### Installation
 
-1.  **Clone the repository**:
-    ```bash
-    git clone <repo-url>
-    cd VEE-THREE
-    ```
+1. Clone the repository:
+   ```bash
+   git clone [repository-url]
+   cd VEE-THREE
+   ```
 
-2.  **Install Dependencies**:
-    ```bash
-    # Install frontend dependencies
-    npm install
+2. Install dependencies for both Frontend and Backend:
+   ```bash
+   npm install
+   cd backend && npm install
+   cd ..
+   ```
 
-    # Install backend dependencies
-    cd backend
-    npm install
-    cd ..
-    ```
+3. Set up environment variables:
+   Copy `.env.example` to `.env` in the root and fill in your keys.
 
-3.  **Configure Environment**:
-    *   Copy `.env.template` to `.env`.
-    *   **Required**: `GEMINI_API_KEY`, `DATABASE_URL`.
-    *   **Auth**: `GOOGLE_CLIENT_ID`, `GITHUB_CLIENT_ID` (or use test mode).
+### Development
 
-4.  **Database Setup**:
-    *   Start Postgres.
-    *   Run Schema: `psql $DATABASE_URL -f backend/src/schema.sql`
+Run both the frontend and backend concurrently:
+```bash
+npm run dev:all
+```
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:3001`
 
-5.  **Run the Application**:
-    ```bash
-    # Run both Frontend and Backend concurrently
-    npm run dev:all
-    ```
-    *   Frontend: `http://localhost:3000`
-    *   Backend: `http://localhost:3001`
+## 📚 Documentation
+- [VEE Mind Protocol](file:///c:/V3/VEE/VEE-THREE/docs/VEE_Mind_Protocol.md): The core behavioral guidelines.
+- [MIGRATION.md](file:///c:/V3/VEE/VEE-THREE/MIGRATION.md): Data transition plan.
 
-### Data Migration
-If you have existing data in `core_memory.json`, refer to `MIGRATION.md`.
-
-## Features
-*   **Secure Authentication**: Google & GitHub OAuth.
-*   **Persistent Memory**: Vector-based memory storage (Backend).
-*   **Chat Interface**: Multimodal chat with file uploads (PDF, ZIP, Images).
-*   **Creative Archive**: Simulated file storage for project assets.
+---
+*Created by the Architect. Maintained by VEE.*

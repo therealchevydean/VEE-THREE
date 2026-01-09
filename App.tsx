@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import ChatInterface from './components/ChatInterface';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -12,9 +13,10 @@ import { Task, TaskStatus, ArchivedFile } from './types';
 import { getConnections, connect, disconnect, Connection } from './services/authService';
 import * as creativeArchiveService from './services/creativeArchiveService';
 import { initializeAgent } from './services/veeAgentService';
-import { AuthProvider } from './components/AuthContext';
+import { AuthProvider, useAuth } from './components/AuthContext';
 
 const VeeApp: React.FC = () => {
+  const { user } = useAuth();
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isTaskBoardOpen, setIsTaskBoardOpen] = useState(false);
@@ -26,17 +28,9 @@ const VeeApp: React.FC = () => {
   const [connections, setConnections] = useState<Record<string, Connection | null>>({});
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [archiveFiles, setArchiveFiles] = useState<ArchivedFile[]>([]);
-  
+
   // Active Workspace (defaults to 'v3_ecosystem')
   const [activeWorkspace, setActiveWorkspace] = useState<string>('v3_ecosystem');
-
-  // Mock user object for components that expect it
-  const mockUser = {
-    id: 1,
-    email: 'user@vee-three.local',
-    display_name: 'VEE User',
-    avatar_url: null
-  };
 
   // Initialize the VEE Agent Scheduler
   useEffect(() => {
@@ -45,22 +39,30 @@ const VeeApp: React.FC = () => {
 
   // Load data from localStorage on initial mount
   useEffect(() => {
-    try {
-      const storedTasks = localStorage.getItem('vee_tasks');
-      if (storedTasks) {
-        setTasks(JSON.parse(storedTasks));
+    const initData = async () => {
+      try {
+        const storedTasks = localStorage.getItem('vee_tasks');
+        if (storedTasks) {
+          setTasks(JSON.parse(storedTasks));
+        }
+        setConnections(getConnections());
+        // Initial load for default workspace
+        const files = await creativeArchiveService.listFiles(activeWorkspace);
+        setArchiveFiles(files);
+      } catch (error) {
+        console.error("Failed to load data from localStorage:", error);
       }
-      setConnections(getConnections());
-      // Initial load for default workspace
-      setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
-    } catch (error) {
-      console.error("Failed to load data from localStorage:", error);
-    }
+    };
+    initData();
   }, []);
 
   // Reload archive files when workspace changes
   useEffect(() => {
-    setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
+    const loadArchive = async () => {
+      const files = await creativeArchiveService.listFiles(activeWorkspace);
+      setArchiveFiles(files);
+    };
+    loadArchive();
   }, [activeWorkspace, isArchiveOpen]);
 
   // Save tasks to localStorage whenever they change
@@ -116,18 +118,21 @@ const VeeApp: React.FC = () => {
     for (const file of files) {
       await creativeArchiveService.uploadFile(file, activeWorkspace);
     }
-    setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
+    const updatedFiles = await creativeArchiveService.listFiles(activeWorkspace);
+    setArchiveFiles(updatedFiles);
   };
 
-  const handleDeleteFromArchive = (gcsPath: string) => {
-    creativeArchiveService.deleteFile(gcsPath);
-    setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
+  const handleDeleteFromArchive = async (gcsPath: string) => {
+    await creativeArchiveService.deleteFile(gcsPath);
+    const updatedFiles = await creativeArchiveService.listFiles(activeWorkspace);
+    setArchiveFiles(updatedFiles);
   };
 
-  const handleRenameArchiveFile = (oldPath: string, newName: string) => {
-    const success = creativeArchiveService.renameFile(oldPath, newName);
+  const handleRenameArchiveFile = async (oldPath: string, newName: string) => {
+    const success = await creativeArchiveService.renameFile(oldPath, newName);
     if (success) {
-      setArchiveFiles(creativeArchiveService.listFiles(activeWorkspace));
+      const updatedFiles = await creativeArchiveService.listFiles(activeWorkspace);
+      setArchiveFiles(updatedFiles);
     }
     return success;
   };
@@ -143,7 +148,7 @@ const VeeApp: React.FC = () => {
         onToggleEngine={handleToggleEngine}
         activeWorkspace={activeWorkspace}
         onSelectWorkspace={setActiveWorkspace}
-        user={mockUser}
+        user={user!}
       />
       <div className="pl-20"> {/* This padding is equal to the collapsed sidebar width */}
         <div className="min-h-screen flex flex-col">
@@ -152,7 +157,7 @@ const VeeApp: React.FC = () => {
             onToggleAudio={() => setIsAudioEnabled(prev => !prev)}
             isScreenSharing={isScreenSharing}
             activeWorkspace={activeWorkspace}
-            user={mockUser}
+            user={user!}
           />
           <main className="flex-1 h-screen overflow-y-hidden p-4">
             <ChatInterface

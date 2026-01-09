@@ -190,7 +190,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         <div className="ml-3 overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                             <p className="text-sm font-medium truncate">{user.display_name || user.email}</p>
                             <button
-                                onClick={() => window.location.href = 'http://localhost:3001/auth/logout'}
+                                onClick={() => alert('Logout is disabled in the prototype.')}
                                 className="text-xs text-red-400 hover:text-red-300 flex items-center mt-1"
                             >
                                 Sign Out

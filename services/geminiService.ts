@@ -691,8 +691,10 @@ export const editImage = async (prompt: string, imageFile: File): Promise<string
             config: { responseModalities: [Modality.IMAGE] },
         });
 
-        for (const p of response.candidates[0].content.parts) {
-            if (p.inlineData) return p.inlineData.data;
+        if (response.candidates && response.candidates[0]?.content?.parts) {
+            for (const p of response.candidates[0].content.parts) {
+                if (p.inlineData?.data) return p.inlineData.data;
+            }
         }
         return null;
     } catch (e) {
@@ -714,7 +716,10 @@ export const generateImage = async (prompt: string): Promise<string | null> => {
             },
         });
 
-        return response.generatedImages[0]?.image.imageBytes || null;
+        if (response.generatedImages && response.generatedImages.length > 0) {
+            return response.generatedImages[0].image?.imageBytes || null;
+        }
+        return null;
     } catch (err) {
         console.error("Gen Image Error:", err);
         return null;
@@ -786,7 +791,7 @@ export const performGroundedSearch = async (
             config,
         });
 
-        const resultText = response.text;
+        const resultText = response.text || '';
         const grounding = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
 
         return { text: resultText, sources: grounding };
