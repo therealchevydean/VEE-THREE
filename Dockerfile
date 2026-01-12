@@ -11,10 +11,12 @@ RUN npm install
 # Copy source and build frontend
 COPY . .
 ARG _VITE_GEMINI_API_KEY
-ENV VITE_GEMINI_API_KEY=${_VITE_GEMINI_API_KEY}RUN npm run build
+ENV VITE_GEMINI_API_KEY=${_VITE_GEMINI_API_KEY}
+RUN npm run build
 
 _ Build backend
 FROM node:20-alpine AS backend-builder
+
 
 WORKDIR /app/backend
 
