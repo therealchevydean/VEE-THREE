@@ -14,12 +14,10 @@ ARG _VITE_GEMINI_API_KEY
 ENV VITE_GEMINI_API_KEY=${_VITE_GEMINI_API_KEY}
 RUN npm run build
 
-_ Build backend
+# Stage 2: Build backen
 FROM node:20-alpine AS backend-builder
 
-
 WORKDIR /app/backend
-
 # COPY backend package files
 COPY backend/package*.json ./
 COPY backend/prisma ./prisma
