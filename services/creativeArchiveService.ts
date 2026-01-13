@@ -1,7 +1,7 @@
 import { ArchivedFile, GCSMetadata, GCSFileType } from '../types';
 import JSZip from 'jszip';
 
-const API_BASE = 'http://localhost:3001/api/gcs';
+const API_BASE = '/api/gcs';
 
 /**
  * Searches across the GCS bucket via Backend API.

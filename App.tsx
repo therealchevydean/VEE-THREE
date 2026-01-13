@@ -4,7 +4,7 @@ import ChatInterface from './components/ChatInterface';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import TaskBoard from './components/TaskBoard';
-import EngineView from './src/pages/EngineView';
+import EngineView from './pages/EngineView';
 import ConnectionsManager from './components/ConnectionsManager';
 import CreativeArchive from './components/CreativeArchive';
 import SettingsPanel from './components/SettingsPanel';

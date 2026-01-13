@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './EngineView.css';
-import { Job, RealWorldTask, PipelineType } from '../types/engine';
+import { Job, RealWorldTask, PipelineType } from '../src/types/engine';
 
 // --- Icon Components ---
 const XMarkIcon: React.FC<{ className?: string }> = ({ className }) => (

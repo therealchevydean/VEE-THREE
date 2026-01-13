@@ -10,7 +10,7 @@ RUN npm install
 
 # Copy source and build frontend
 COPY . .
-RUN npm run build
+RUN npm run build && [ -d "dist" ] || { echo "Build failed: dist directory not found"; exit 1; }
 
 # Stage 2: Build backend
 FROM node:20-alpine AS backend-builder
