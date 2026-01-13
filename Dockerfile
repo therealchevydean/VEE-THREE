@@ -10,15 +10,17 @@ RUN npm install
 
 # Copy source and build frontend
 COPY . .
+ARG _VITE_GEMINI_API_KEY
+ENV VITE_GEMINI_API_KEY=${_VITE_GEMINI_API_KEY}
 RUN npm run build && [ -d "dist" ] || { echo "Build failed: dist directory not found"; exit 1; }
 
 # Stage 2: Build backend
 FROM node:20-alpine AS backend-builder
 
 WORKDIR /app/backend
-
 # COPY backend package files
 COPY backend/package*.json ./
+COPY backend/prisma ./prisma
 RUN npm install
 
 # COPY backend source
